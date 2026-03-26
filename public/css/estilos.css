@@ -1,0 +1,545 @@
+@charset "UTF-8";
+h2 {
+  font-family: "EB Garamond", system-ui, -apple-system;
+}
+
+.main-content {
+  padding-top: 80px;
+}
+
+.menuPuklla {
+  font-family: "EB Garamond", system-ui, -apple-system;
+  font-size: 16px;
+  height: 5em;
+  background: #f2f2f2;
+  border-bottom: 1px solid rgba(200, 142, 65, 0.2);
+  z-index: 999;
+}
+.menuPuklla .logo {
+  width: 150px;
+}
+.menuPuklla .collapse {
+  transition: height 0.2s ease;
+  margin-top: -0.1em;
+  background: #f2f2f2;
+}
+.menuPuklla ul li a {
+  font-weight: 600;
+  text-transform: capitalize;
+  transition: 0.4s ease;
+}
+@media (max-width: 767px) {
+  .menuPuklla .container {
+    padding: 0;
+  }
+  .menuPuklla .container .navbar-toggler {
+    margin-right: 1em;
+  }
+  .menuPuklla .container .logo {
+    width: 140px;
+    margin-left: 1em;
+  }
+  .menuPuklla .container .collapse {
+    padding-left: 2em;
+    padding-right: 2em;
+  }
+  .menuPuklla .container .collapse.collapsing ul li {
+    border-bottom: 1px dashed grey;
+    text-align: center;
+  }
+  .menuPuklla .container .collapse.collapsing ul .searchButtom {
+    width: 100%;
+    border-bottom: none;
+    margin-bottom: 1em;
+  }
+  .menuPuklla .container .collapse.show ul li {
+    border-bottom: 1px dashed grey;
+    text-align: center;
+  }
+  .menuPuklla .container .collapse.show ul .searchButtom {
+    width: 100%;
+    border-bottom: none;
+    margin-bottom: 1em;
+  }
+}
+
+/* .menuPuklla {
+    font-family: "EB Garamond", system-ui, -apple-system;
+    font-size: 16px;
+    height: 5em;
+    background: #f2f2f2;
+    border-bottom: 1px solid #c88e4133;
+    z-index: 999;
+
+    .logo {
+        width: 150px;
+    }
+
+    .collapse {
+        transition: 0.2s ease;
+        margin-top: -0.1em;
+        background: #f2f2f2;
+    }
+
+    ul {
+        li {
+            a {
+                font-weight: 600;
+                text-transform: capitalize;
+                transition: 0.4s ease;
+            }
+        }
+    }
+
+    @media (max-width: 767px) {
+        .container {
+            padding: 0;
+            .navbar-toggler {
+                margin-right: 1.5em;
+            }
+            .logo {
+                width: 130px;
+                margin-left: 1em;
+            }
+            .collapse {
+                padding-left: 2em;
+                padding-right: 2em;
+                ul {
+                    li {
+                        border-bottom: 1px dashed grey;
+                        text-align: center;
+                    }
+                    .searchButtom {
+                        width: 100%;
+                        border-bottom: none;
+                        margin-bottom: 1em;
+                    }
+                }
+            }
+        }
+    }
+} */
+.wasa:hover {
+  color: #25d366 !important;
+}
+
+.fixed-image-container {
+  margin-top: 2em;
+  position: relative;
+  width: 100%;
+  height: 60vh;
+  overflow: hidden;
+  background-image: url("/img/fondo/sisi-fondo.png");
+  background-size: cover;
+  background-position: 50% 100%;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+.fixed-image-container .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+.fixed-image-container .centered-content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: white;
+  z-index: 1;
+}
+.fixed-image-container .centered-content h1,
+.fixed-image-container .centered-content h2 {
+  font-family: "EB Garamond", system-ui, -apple-system;
+}
+.fixed-image-container .centered-content h1 {
+  font-size: 52px;
+}
+.fixed-image-container .centered-content h2 {
+  position: relative;
+}
+.fixed-image-container .centered-content h2::after {
+  content: "";
+  display: block;
+  width: 75px;
+  height: 2px;
+  background-color: white;
+  margin: 10px auto 0;
+}
+
+.cardVideos {
+  background: #474747;
+  color: #fff;
+  border-radius: 5px;
+  transition: 0.4s ease;
+  overflow: hidden;
+  padding: 10px;
+}
+.cardVideos:hover {
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  transition: 0.4s ease;
+}
+.cardVideos h6 {
+  padding-left: 0em;
+  padding-top: 0.9em;
+  position: relative;
+}
+.cardVideos h6::after {
+  content: "";
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: #cb9042;
+  position: absolute;
+  bottom: -0.3em;
+}
+.cardVideos p {
+  padding-top: 0.3em;
+}
+
+.contenedorContenido .cardIndex .col-lg-4 {
+  position: relative;
+}
+.contenedorContenido .cardIndex .col-lg-4:hover img {
+  transform: scale(1.1);
+}
+.contenedorContenido .cardIndex .col-lg-4:hover a {
+  left: 50%;
+  transition: 0.4s ease;
+}
+.contenedorContenido .cardIndex .col-lg-4 .contenedor {
+  margin: 0em 0em 2em 0em;
+  position: relative;
+  overflow: hidden;
+  border-radius: 5px;
+}
+.contenedorContenido .cardIndex .col-lg-4 .contenedor::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 3;
+}
+.contenedorContenido .cardIndex .col-lg-4 .contenedor img {
+  height: 230px;
+  object-fit: cover;
+  width: 100%;
+  z-index: 1;
+  transition: transform 0.4s ease;
+}
+.contenedorContenido .cardIndex .col-lg-4 h2 {
+  position: absolute;
+  top: 40%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 4;
+  font-size: 25px;
+  font-family: "EB Garamond", system-ui, -apple-system;
+}
+.contenedorContenido .cardIndex .col-lg-4 a {
+  position: absolute;
+  top: 55%;
+  left: -30%;
+  transform: translateX(-50%);
+  z-index: 4;
+  color: white;
+  text-align: center;
+  transition: 0.4s ease;
+  background: #cb9042;
+  padding: 4px 8px 4px 8px;
+  border-radius: 5px;
+  text-decoration: none;
+  text-transform: uppercase;
+  font-size: 12px;
+  font-weight: 600;
+}
+.contenedorContenido .cardIndex .col-lg-4 a:hover {
+  background: #af7d39;
+}
+.contenedorContenido .titulosDos {
+  font-size: 28px;
+  position: relative;
+  margin-bottom: 1.4em !important;
+}
+.contenedorContenido .titulosDos::before {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  height: 2px;
+  width: 50px;
+  background-color: #000;
+}
+.contenedorContenido .verMas {
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.normalSize {
+  display: block;
+}
+@media (max-width: 991.98px) {
+  .normalSize {
+    display: none !important;
+  }
+}
+
+.responsive {
+  display: none;
+}
+@media (max-width: 991.98px) {
+  .responsive {
+    display: block;
+  }
+}
+
+.titulo2Puklla {
+  text-align: center;
+  margin-top: 0.5em;
+  position: relative;
+}
+.titulo2Puklla::before {
+  content: "";
+  position: absolute;
+  bottom: -5px;
+  left: 50%;
+  transform: translateX(-50%);
+  height: 3px;
+  width: 60px;
+  background-color: #c88e41;
+}
+
+.cardLibros {
+  text-align: center;
+}
+.cardLibros .card {
+  background: #474747;
+}
+.cardLibros h5 {
+  position: relative;
+  display: inline-block;
+  padding-bottom: 10px;
+  margin-bottom: 10px;
+  color: #fff;
+  text-align: center;
+}
+.cardLibros h5::after {
+  content: "";
+  display: block;
+  width: 30%;
+  margin: 0 auto;
+  height: 2px;
+  background-color: #e2b77c;
+  position: absolute;
+  bottom: 0;
+  left: 35%;
+}
+.cardLibros p {
+  color: #fff;
+}
+.cardLibros p i {
+  color: #fff;
+}
+.cardLibros .contenedorLibro {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  /* Ajusta el ancho máximo según tu diseño */
+  margin: 0 auto;
+  border: 1px solid rgba(128, 128, 128, 0.3019607843);
+}
+.cardLibros .contenedorLibro .contenedorImagen {
+  position: relative;
+}
+.cardLibros .contenedorLibro .contenedorImagen .vistaPrevia {
+  width: 100%;
+  display: block;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 3px;
+}
+.cardLibros .contenedorLibro .contenedorImagen .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(90, 90, 90, 0.418);
+  /* Fondo oscuro semi-transparente */
+  opacity: 0;
+  /* Ocultar inicialmente */
+  transition: opacity 0.3s ease;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.cardLibros .contenedorLibro .contenedorImagen .overlay:hover {
+  opacity: 1;
+}
+.cardLibros .contenedorLibro .contenedorImagen .overlay:hover .btnAbrirPDF {
+  transform: translateY(0px);
+}
+.cardLibros .contenedorLibro .contenedorImagen .overlay .btnAbrirPDF {
+  background-color: #4766c2;
+  /* Color de fondo del botón */
+  color: #fff;
+  /* Color de texto del botón */
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  text-decoration: none;
+  box-shadow: rgba(0, 0, 0, 0.35) 0px 5px 15px;
+  cursor: pointer;
+  transform: translateY(15px);
+  transition: background-color 0.4s ease, color 0.4s ease, transform 0.4s ease;
+  position: relative;
+}
+.cardLibros .contenedorLibro .contenedorImagen .overlay .btnAbrirPDF:hover {
+  background-color: #c68d40;
+  color: #fff;
+}
+
+.menu-secciones {
+  list-style: none;
+  padding-left: 0;
+}
+.menu-secciones li {
+  margin-bottom: 10px;
+}
+.menu-secciones li ul.categorias {
+  display: none;
+  list-style: none;
+  padding-left: 0;
+}
+.menu-secciones li ul.categorias li {
+  margin-bottom: 5px;
+}
+.menu-secciones li:hover > ul.categorias {
+  display: block;
+}
+
+.custom-sidebar {
+  color: #333;
+  box-sizing: border-box;
+  height: 100%;
+}
+.custom-sidebar .custom-sidebar-title {
+  text-align: center;
+  margin-bottom: 0.7em;
+}
+.custom-sidebar .custom-sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-menu-item {
+  margin-bottom: 10px;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-menu-item .custom-sidebar-submenu-item {
+  margin-bottom: 5px;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-menu-item .custom-sidebar-submenu-item a {
+  font-weight: 500;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-submenu {
+  display: none;
+  list-style: none;
+  padding: 0;
+  margin: 10px 0 0 25px;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-link {
+  text-decoration: none;
+  color: #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  border-radius: 4px;
+  border-bottom: dashed 1px #d39c54;
+  font-weight: bold;
+}
+.custom-sidebar .custom-sidebar-menu .custom-sidebar-link:hover {
+  background: rgba(85, 85, 85, 0.0666666667);
+}
+
+.custom-toggle-icon {
+  transition: transform 0.3s ease;
+  font-size: 9px;
+}
+.custom-toggle-icon.rotate {
+  transform: rotate(180deg);
+}
+
+/* New styles for open submenus */
+.custom-sidebar-menu-item.submenu-open .custom-sidebar-link {
+  background: rgba(85, 85, 85, 0.2);
+}
+
+.footer {
+  background: #6a0310;
+}
+.footer img {
+  width: 260px;
+}
+.footer p {
+  margin-bottom: 4px;
+  color: #fff;
+}
+.footer a {
+  color: #fff;
+  text-decoration: none;
+}
+.footer h3 {
+  color: #fff;
+  text-transform: uppercase;
+  font-size: 18px;
+  font-family: "EB Garamond", system-ui, -apple-system;
+  position: relative;
+  margin-bottom: 1.8em;
+}
+.footer h3:after {
+  content: "";
+  display: block;
+  width: 35px;
+  height: 2px;
+  background-color: #fff;
+  position: absolute;
+  bottom: -10px;
+  left: 0;
+}
+.footer ul {
+  color: #fff;
+}
+.footer .listaSociales {
+  margin-top: 3em;
+}
+.footer .listaSociales li:first-child {
+  margin-left: -30px;
+}
+.footer .listaSociales li {
+  display: inline-block;
+}
+.footer .listaSociales li .social {
+  margin-right: 0.8em;
+  background: #fff;
+  border-radius: 50%;
+  padding: 12px 14px;
+  transition: 0.4s ease-in-out;
+  position: relative;
+  color: #333;
+}
+.footer .listaSociales li .social:hover {
+  background: #cb9042;
+  transform: translateY(-0.2em);
+  transition: 0.3s ease-in-out;
+  color: #fff;
+}
+
+/*# sourceMappingURL=estilos.css.map */
