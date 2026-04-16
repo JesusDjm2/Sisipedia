@@ -105,16 +105,57 @@
                                 <label for="image">Imagen</label>
                                 <input type="file" class="form-control @error('image') is-invalid @enderror"
                                     id="image" name="image" accept="image/*">
-                                <small class="form-text text-muted">
-                                    Formatos permitidos: JPG, PNG, GIF. Máximo 2MB.
-                                </small>
+                                <small class="form-text text-muted">Formatos permitidos: JPG, PNG, WEBP. Máximo 2MB.</small>
                                 @error('image')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
 
+                            <div class="row">
+                                <div class="col-4">
+                                    <div class="form-group mb-3">
+                                        <label for="pdf"><i class="fa fa-file-pdf text-danger me-1"></i> PDF</label>
+                                        <input type="file" class="form-control @error('pdf') is-invalid @enderror"
+                                            id="pdf" name="pdf" accept=".pdf">
+                                        <small class="form-text text-muted">Formato: PDF. Máximo 20MB. Se sube a Google
+                                            Drive.</small>
+                                        @error('pdf')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group mb-3">
+                                        <label for="audio"><i class="fa fa-music text-primary me-1"></i> Audio</label>
+                                        <input type="file" class="form-control @error('audio') is-invalid @enderror"
+                                            id="audio" name="audio" accept=".mp3,.wav,.ogg">
+                                        <small class="form-text text-muted">Formatos: MP3, WAV, OGG. Máximo 50MB. Se sube a
+                                            Google Drive.</small>
+                                        @error('audio')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+
+                                <div class="col-4">
+                                    <div class="form-group mb-3">
+                                        <label for="video"><i class="fa fa-video text-success me-1"></i> Video</label>
+                                        <input type="file" class="form-control @error('video') is-invalid @enderror"
+                                            id="video" name="video" accept=".mp4,.webm,.mov">
+                                        <small class="form-text text-muted">Formatos: MP4, WEBM, MOV. Máximo 200MB. Se sube
+                                            a
+                                            Google Drive.</small>
+                                        @error('video')
+                                            <div class="invalid-feedback">{{ $message }}</div>
+                                        @enderror
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="form-group mb-3">
-                                <label for="order">Orden <small class="text-info">Ejemplos: hijo (order = 1) → será 1.1 |
+                                <label for="order">Orden <small class="text-info">Ejemplos: hijo (order = 1) → será 1.1
+                                        |
                                         (order = 2) → será 1.2 | (order = 3) → será 1.3</small></label>
                                 <input type="number" class="form-control @error('order') is-invalid @enderror"
                                     id="order" name="order" value="{{ old('order') }}"

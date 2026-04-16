@@ -10,6 +10,7 @@ use App\Http\Controllers\SeccionController;
 use App\Http\Controllers\sisipedia\CategoryController;
 use App\Http\Controllers\VideoCategoriaController;
 use App\Http\Controllers\VideoController;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 /* Route::get('/', function () {
@@ -56,23 +57,32 @@ Route::middleware('auth')->group(function () {
 
 //Sisipedia
 Route::prefix('sisipedia')->name('sisipedia.')->group(function () {
-    Route::resource('categories', CategoryController::class);
-    // Rutas adicionales
-    Route::get('categories/{category}/children', [CategoryController::class, 'getChildren'])
-        ->name('categories.children');
-    Route::post('categories/reorder', [CategoryController::class, 'reorder'])
-        ->name('categories.reorder');
-    Route::get('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
-        ->name('categories.toggle-status');
+    // Admin primero (rutas fijas como /create, /reorder deben resolverse antes que {category})
+    Route::middleware('auth')->group(function () {
+        Route::resource('categories', CategoryController::class)->except(['show']);
+        Route::get('categories/{category}/admin', [CategoryController::class, 'adminShow'])
+            ->name('categories.admin-show');
+        Route::get('categories/{category}/children', [CategoryController::class, 'getChildren'])
+            ->name('categories.children');
+        Route::post('categories/reorder', [CategoryController::class, 'reorder'])
+            ->name('categories.reorder');
+        Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
+            ->name('categories.toggle-status');
+    });
+
+    // Detalle público al final (wildcard {category} no captura rutas fijas de arriba)
+    Route::get('categories/{category}', [CategoryController::class, 'show'])
+        ->name('categories.show');
 });
 
-Route::get('sisipedia/categorias', [CategoryController::class, 'show'])->name('public.sisi');
+Route::get('sisipedia/registros', [CategoryController::class, 'registros'])->name('public.sisi');
+Route::get('sisipedia/categorias', [CategoryController::class, 'publicIndex'])->name('public.categoria.sisi');
 
-Route::get('/limpiar-cache', function () {
+/* Route::get('/limpiar-cache', function () {
     Artisan::call('cache:clear');
     Artisan::call('view:clear');
     Artisan::call('config:clear');
     Artisan::call('route:clear');
-
     return 'Cache limpiada correctamente';
 });
+ */

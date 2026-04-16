@@ -1,7 +1,6 @@
 @extends('layouts.app')
 @section('titulo', 'Categorías')
 @section('contenido')
-
     <div class="container-fluid py-4">
         <div class="card">
             <div class="card-header">
@@ -32,7 +31,6 @@
                         <i class="fa fa-info-circle"></i> La búsqueda filtrará categorías y mostrará su jerarquía
                     </small>
                 </div>
-
                 <!-- Estructura jerárquica de categorías -->
                 <div id="categoryTree">
                     @if ($tree->count())
@@ -223,11 +221,36 @@
         }
     </style>
 
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const searchInput = document.getElementById('searchCategory');
             const clearButton = document.getElementById('clearSearch');
             const categoryItems = document.querySelectorAll('.category-item');
+            const csrfToken = '{{ csrf_token() }}';
+
+            function submitPostForm(action, method = null) {
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = action;
+
+                const csrf = document.createElement('input');
+                csrf.type = 'hidden';
+                csrf.name = '_token';
+                csrf.value = csrfToken;
+                form.appendChild(csrf);
+
+                if (method) {
+                    const methodInput = document.createElement('input');
+                    methodInput.type = 'hidden';
+                    methodInput.name = '_method';
+                    methodInput.value = method;
+                    form.appendChild(methodInput);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+            }
 
             // Función para buscar y filtrar
             function filterCategories(searchTerm) {
@@ -336,6 +359,52 @@
                             icon.classList.add('fa-chevron-right');
                         }
                     }
+                });
+            });
+
+            document.querySelectorAll('.toggle-status-btn').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const toggleUrl = this.dataset.toggleUrl;
+                    const isActive = this.dataset.active === '1';
+                    const actionText = isActive ? 'desactivar' : 'activar';
+
+                    Swal.fire({
+                        title: 'Confirmar cambio',
+                        text: `¿Deseas ${actionText} este registro?`,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonText: `Sí, ${actionText}`,
+                        cancelButtonText: 'Cancelar',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            submitPostForm(toggleUrl);
+                        }
+                    });
+                });
+            });
+
+            document.querySelectorAll('.delete-category').forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const categoryName = this.dataset.name;
+                    const deleteUrl = this.dataset.deleteUrl;
+
+                    Swal.fire({
+                        title: 'Eliminar registro',
+                        text: `¿Estás seguro de eliminar "${categoryName}"? Esta acción no se puede deshacer.`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Sí, eliminar',
+                        cancelButtonText: 'Cancelar',
+                        confirmButtonColor: '#d33',
+                        reverseButtons: true
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            submitPostForm(deleteUrl, 'DELETE');
+                        }
+                    });
                 });
             });
         });

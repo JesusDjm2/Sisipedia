@@ -41,13 +41,13 @@
 
         @role('sisicha')
             <div class="col-lg-3 p-3">
-                <a href="{{ route('libros.index') }}">
+                <a href="{{ route('sisipedia.categories.index') }}">
                     <img src="{{ asset('img/Sisichakuna.webp') }}" width="100%" loading="lazy">
                 </a>
             </div>
-            <div class="col-lg-3 p3">
+            {{-- <div class="col-lg-3 p3">
                 <a href="{{ route('sisipedia.categories.index') }}">IR</a>
-            </div>
+            </div> --}}
         @endrole
         @role('admin')
             <div class="col-lg-3 p-3">

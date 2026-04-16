@@ -13,7 +13,7 @@
                         <a class="nav-link active" aria-current="page" href="{{ route('index') }}">Inicio</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Sisipedia</a>
+                        <a class="nav-link" href="{{ route('public.sisi') }}">Sisipedia</a>
                     </li>                    
                     <li class="nav-item">
                         <a class="nav-link" href="{{ route('videos') }}">Videos</a>

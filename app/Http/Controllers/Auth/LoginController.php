@@ -17,9 +17,28 @@ class LoginController extends Controller
 
         if ($user->hasRole('admin')) {
             return '/home';
-        } elseif ($user->hasRole('alumno')) {
+        }
+
+        if ($user->hasRole('sisicha')) {
+            return '/Admini-Sisichakunay';
+        }
+
+        if ($user->hasRole('biblioteca')) {
+            return '/Bibliotecario';
+        }
+
+        if ($user->hasRole('videos')) {
+            return '/Administrador-Videos';
+        }
+
+        if ($user->hasRole('audios')) {
+            return '/Administrador-Canciones';
+        }
+
+        if ($user->hasRole('alumno')) {
             return '/';
         }
+
         return '/';
     }
 

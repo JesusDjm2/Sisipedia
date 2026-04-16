@@ -122,8 +122,8 @@
                                 <label for="image">Imagen</label>
                                 @if($category->image)
                                     <div class="mb-2">
-                                        <img src="{{ asset($category->image) }}" 
-                                             alt="{{ $category->name }}" 
+                                        <img src="{{ asset($category->image) }}"
+                                             alt="{{ $category->name }}"
                                              style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                                         <div class="form-check mt-2">
                                             <input type="checkbox" class="form-check-input" id="remove_image" name="remove_image" value="1">
@@ -135,10 +135,82 @@
                                 @endif
                                 <input type="file" class="form-control @error('image') is-invalid @enderror"
                                     id="image" name="image" accept="image/*">
-                                <small class="form-text text-muted">
-                                    Formatos permitidos: JPG, PNG, GIF, WEBP. Máximo 2MB. Si seleccionas una nueva imagen, reemplazará la actual.
-                                </small>
+                                <small class="form-text text-muted">Formatos: JPG, PNG, GIF, WEBP. Máximo 2MB.</small>
                                 @error('image')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- PDF --}}
+                            <div class="form-group mb-3">
+                                <label for="pdf"><i class="fa fa-file-pdf text-danger me-1"></i> PDF</label>
+                                @if($category->pdf)
+                                    <div class="mb-2 d-flex align-items-center gap-2">
+                                        <a href="{{ \App\Services\GoogleDriveService::getUrl($category->pdf) }}"
+                                           target="_blank" class="btn btn-sm btn-outline-danger">
+                                            <i class="fa fa-external-link-alt me-1"></i> Ver PDF actual
+                                        </a>
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="remove_pdf" name="remove_pdf" value="1">
+                                            <label class="form-check-label text-danger" for="remove_pdf">
+                                                <i class="fa fa-trash"></i> Eliminar
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control @error('pdf') is-invalid @enderror"
+                                    id="pdf" name="pdf" accept=".pdf">
+                                <small class="form-text text-muted">Formato: PDF. Máximo 20MB. Se sube a Google Drive.</small>
+                                @error('pdf')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Audio --}}
+                            <div class="form-group mb-3">
+                                <label for="audio"><i class="fa fa-music text-primary me-1"></i> Audio</label>
+                                @if($category->audio)
+                                    <div class="mb-2">
+                                        <audio controls class="w-100" style="max-width:400px;">
+                                            <source src="{{ \App\Services\GoogleDriveService::getEmbedUrl($category->audio) }}">
+                                        </audio>
+                                        <div class="form-check mt-1">
+                                            <input type="checkbox" class="form-check-input" id="remove_audio" name="remove_audio" value="1">
+                                            <label class="form-check-label text-danger" for="remove_audio">
+                                                <i class="fa fa-trash"></i> Eliminar audio actual
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control @error('audio') is-invalid @enderror"
+                                    id="audio" name="audio" accept=".mp3,.wav,.ogg">
+                                <small class="form-text text-muted">Formatos: MP3, WAV, OGG. Máximo 50MB. Se sube a Google Drive.</small>
+                                @error('audio')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+
+                            {{-- Video --}}
+                            <div class="form-group mb-3">
+                                <label for="video"><i class="fa fa-video text-success me-1"></i> Video</label>
+                                @if($category->video)
+                                    <div class="mb-2 d-flex align-items-center gap-2">
+                                        <a href="{{ \App\Services\GoogleDriveService::getUrl($category->video) }}"
+                                           target="_blank" class="btn btn-sm btn-outline-success">
+                                            <i class="fa fa-external-link-alt me-1"></i> Ver video actual
+                                        </a>
+                                        <div class="form-check mb-0">
+                                            <input type="checkbox" class="form-check-input" id="remove_video" name="remove_video" value="1">
+                                            <label class="form-check-label text-danger" for="remove_video">
+                                                <i class="fa fa-trash"></i> Eliminar
+                                            </label>
+                                        </div>
+                                    </div>
+                                @endif
+                                <input type="file" class="form-control @error('video') is-invalid @enderror"
+                                    id="video" name="video" accept=".mp4,.webm,.mov">
+                                <small class="form-text text-muted">Formatos: MP4, WEBM, MOV. Máximo 200MB. Se sube a Google Drive.</small>
+                                @error('video')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>

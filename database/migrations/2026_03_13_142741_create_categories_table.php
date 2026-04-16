@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('categories', function (Blueprint $table) {
@@ -20,6 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('parent_id')->nullable();
             $table->integer('order')->default(0);
             $table->boolean('is_active')->default(true);
+            $table->string('pdf')->nullable();
+            $table->string('video')->nullable();
+            $table->string('audio')->nullable();
             $table->timestamps();
 
             // Índices y claves foráneas
@@ -31,10 +31,7 @@ return new class extends Migration
             $table->index(['parent_id', 'order']);
         });
     }
-
-    /**
-     * Reverse the migrations.
-     */
+    
     public function down(): void
     {
         Schema::dropIfExists('categories');

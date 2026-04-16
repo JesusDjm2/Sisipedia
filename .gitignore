@@ -12,8 +12,13 @@
 Homestead.json
 Homestead.yaml
 auth.json
+/storage/app/google-credentials.json
 npm-debug.log
 yarn-error.log
 /.fleet
 /.idea
 /.vscode
+/.claude
+**/_notes/
+vendor-google.tar.gz
+fix-after-import.php
