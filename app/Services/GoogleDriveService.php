@@ -29,6 +29,7 @@ class GoogleDriveService
 
         $this->folderIds = [
             'pdf'   => env('GOOGLE_DRIVE_FOLDER_PDF'),
+            'doc'   => env('GOOGLE_DRIVE_FOLDER_PDF'),  // docs van a la misma carpeta que pdf
             'audio' => env('GOOGLE_DRIVE_FOLDER_AUDIO'),
             'video' => env('GOOGLE_DRIVE_FOLDER_VIDEO'),
         ];

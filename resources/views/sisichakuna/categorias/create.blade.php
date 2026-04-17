@@ -41,46 +41,18 @@
                                     name="parent_id">
                                     <option value="">-- Ninguna (Raíz) --</option>
                                     @foreach ($parents as $parent)
-                                        <option value="{{ $parent->id }}" data-numbering="{{ $parent->numbering }}"
+                                        <option value="{{ $parent->id }}"
+                                            data-depth="{{ $parent->depth }}"
                                             {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                            {{ $parent->numbering }} - {{ $parent->name }}
+                                            {{ str_repeat('— ', $parent->depth) }}{{ $parent->name }}
                                         </option>
-                                        @if ($parent->children->count())
-                                            @foreach ($parent->children as $child)
-                                                <option value="{{ $child->id }}"
-                                                    data-numbering="{{ $child->numbering }}"
-                                                    {{ old('parent_id') == $child->id ? 'selected' : '' }}>
-                                                    {{ $child->numbering }} - {{ $child->name }}
-                                                </option>
-                                                @if ($child->children->count())
-                                                    @foreach ($child->children as $grandchild)
-                                                        <option value="{{ $grandchild->id }}"
-                                                            data-numbering="{{ $grandchild->numbering }}"
-                                                            {{ old('parent_id') == $grandchild->id ? 'selected' : '' }}>
-                                                            {{ $grandchild->numbering }} - {{ $grandchild->name }}
-                                                        </option>
-                                                        @if ($grandchild->children->count())
-                                                            @foreach ($grandchild->children as $greatGrandchild)
-                                                                <option value="{{ $greatGrandchild->id }}"
-                                                                    data-numbering="{{ $greatGrandchild->numbering }}"
-                                                                    {{ old('parent_id') == $greatGrandchild->id ? 'selected' : '' }}>
-                                                                    {{ $greatGrandchild->numbering }} -
-                                                                    {{ $greatGrandchild->name }}
-                                                                </option>
-                                                            @endforeach
-                                                        @endif
-                                                    @endforeach
-                                                @endif
-                                            @endforeach
-                                        @endif
                                     @endforeach
                                 </select>
                                 @error('parent_id')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                                 <small class="form-text text-muted">
-                                    <i class="fa fa-info-circle"></i> Selecciona la categoría padre para crear una
-                                    subcategoría
+                                    <i class="fa fa-info-circle"></i> Selecciona la categoría padre para crear una subcategoría
                                 </small>
                             </div>
 
@@ -111,47 +83,8 @@
                                 @enderror
                             </div>
 
-                            <div class="row">
-                                <div class="col-4">
-                                    <div class="form-group mb-3">
-                                        <label for="pdf"><i class="fa fa-file-pdf text-danger me-1"></i> PDF</label>
-                                        <input type="file" class="form-control @error('pdf') is-invalid @enderror"
-                                            id="pdf" name="pdf" accept=".pdf">
-                                        <small class="form-text text-muted">Formato: PDF. Máximo 20MB. Se sube a Google
-                                            Drive.</small>
-                                        @error('pdf')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="form-group mb-3">
-                                        <label for="audio"><i class="fa fa-music text-primary me-1"></i> Audio</label>
-                                        <input type="file" class="form-control @error('audio') is-invalid @enderror"
-                                            id="audio" name="audio" accept=".mp3,.wav,.ogg">
-                                        <small class="form-text text-muted">Formatos: MP3, WAV, OGG. Máximo 50MB. Se sube a
-                                            Google Drive.</small>
-                                        @error('audio')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-
-                                <div class="col-4">
-                                    <div class="form-group mb-3">
-                                        <label for="video"><i class="fa fa-video text-success me-1"></i> Video</label>
-                                        <input type="file" class="form-control @error('video') is-invalid @enderror"
-                                            id="video" name="video" accept=".mp4,.webm,.mov">
-                                        <small class="form-text text-muted">Formatos: MP4, WEBM, MOV. Máximo 200MB. Se sube
-                                            a
-                                            Google Drive.</small>
-                                        @error('video')
-                                            <div class="invalid-feedback">{{ $message }}</div>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
+                            {{-- Archivos múltiples --}}
+                            @include('sisichakuna.categorias._file-inputs')
 
                             <div class="form-group mb-3">
                                 <label for="order">Orden <small class="text-info">Ejemplos: hijo (order = 1) → será 1.1
@@ -225,53 +158,16 @@
                 }
             });
 
-            // Función para obtener el próximo número de orden
-            function getNextNumber(parentId) {
-                if (!parentId) {
-                    // Es categoría raíz
-                    const rootOptions = Array.from(parentSelect.options)
-                        .filter(opt => opt.value !== '' && !opt.getAttribute('data-numbering'));
-                    return rootOptions.length + 1;
-                } else {
-                    // Es subcategoría - contar cuántos hijos tiene este padre específico
-                    const selectedOption = parentSelect.options[parentSelect.selectedIndex];
-                    const parentNumbering = selectedOption.getAttribute('data-numbering');
-
-                    // Contar opciones que tienen este padre como prefijo exacto (sin contar el padre mismo)
-                    const siblings = Array.from(parentSelect.options)
-                        .filter(opt => {
-                            const numbering = opt.getAttribute('data-numbering');
-                            return numbering && numbering.startsWith(parentNumbering + '.');
-                        });
-                    return siblings.length + 1;
+            parentSelect.addEventListener('change', function () {
+                previewNumbering.style.display = parentSelect.value ? 'block' : 'none';
+                if (parentSelect.value) {
+                    const depth = parseInt(parentSelect.options[parentSelect.selectedIndex].getAttribute('data-depth') || '0');
+                    previewNumberingValue.textContent = '—'.repeat(depth + 1) + ' (nivel ' + (depth + 1) + ')';
                 }
-            }
+            });
 
-            // Calcular y mostrar la numeración prevista
-            function calculatePreviewNumbering() {
-                const selectedOption = parentSelect.options[parentSelect.selectedIndex];
-                const parentNumbering = selectedOption.getAttribute('data-numbering');
-
-                if (!parentSelect.value) {
-                    // Es categoría raíz
-                    const nextNumber = getNextNumber(null);
-                    previewNumberingValue.textContent = nextNumber.toString();
-                    previewNumbering.style.display = 'block';
-                } else if (parentNumbering) {
-                    // Es subcategoría
-                    const nextNumber = getNextNumber(parentSelect.value);
-                    previewNumberingValue.textContent = parentNumbering + '.' + nextNumber;
-                    previewNumbering.style.display = 'block';
-                } else {
-                    previewNumbering.style.display = 'none';
-                }
-            }
-
-            parentSelect.addEventListener('change', calculatePreviewNumbering);
-
-            // Calcular inicialmente si hay un valor seleccionado
             if (parentSelect.value) {
-                calculatePreviewNumbering();
+                parentSelect.dispatchEvent(new Event('change'));
             }
         });
     </script>

@@ -1,63 +1,175 @@
 @extends('layouts.padre')
 @section('titulo', '- Página de Inicio')
 @section('contenido')
+    @if (session('busqueda_error'))
+        <div class="container pt-5 mt-5">
+            <div class="alert alert-warning alert-dismissible fade show shadow-sm rounded-3 border-0" role="alert">
+                <i class="fas fa-search me-2"></i>{{ session('busqueda_error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+            </div>
+        </div>
+    @endif
     <div class="fixed-image-container">
         <div class="overlay"></div>
         <div class="centered-content">
             <h2>SISIPEDIA</h2>
-            <h1>Sistema Bibliotecario</h1>
+            <h1>Comunidad de interaprendizaje</h1>
         </div>
     </div>
     <div class="container mt-4 contenedorContenido">
-        <div class="row cardIndex">
-            <div class="col-lg-4">
+        <div class="row cardIndex g-4 justify-content-center row-cols-1 row-cols-md-2 row-cols-xl-4">
+            <div class="col">
                 <div class="contenedor">
-                    <img src="{{ asset('img/min/libros-Pukllasunchis-min.webp') }}" alt="Libros Puklla" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Biblioteca</h2>
-                    <a href="{{ route('libros') }}">Ver lista</a>
+                    <img src="{{ asset('img/min/radio-Pukllasunchis.webp') }}" alt="" class="img-fluid">
+                    <h2 class="position-absolute text-center text-white px-2">Sisichakunaq Pukllaynin</h2>
+                    <a href="{{ route('public.sisi') }}">Ver registros</a>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col">
                 <div class="contenedor">
-                    <img src="{{ asset('img/min/formacion-continua-pukllasunchis-01.webp') }}" alt="Libros Puklla"
-                        class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Videos Institucionales</h2>
-                    <a href="{{ route('videos') }}">Ver lista</a>
+                    <img src="{{ asset('img/min/formacion-continua-pukllasunchis-01.webp') }}" alt="" class="img-fluid">
+                    <h2 class="position-absolute text-center text-white">Videos</h2>
+                    <a href="{{ route('videos') }}">Ver videos institucionales</a>
                 </div>
             </div>
-            <div class="col-lg-4">
+            <div class="col">
                 <div class="contenedor">
-                    <img src="{{ asset('img/min/radio-Pukllasunchis.webp') }}" alt="Libros Puklla" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Sisichakunay</h2>
-                    <a href="">Ver lista</a>
+                    <img src="{{ asset('img/min/canciones-Pukllasunchis.webp') }}" alt="" class="img-fluid">
+                    <h2 class="position-absolute text-center text-white">Audio</h2>
+                    <a href="#home-audios-sisipedia">Audios en esta página</a>
                 </div>
             </div>
-            <div class="col-lg-4">
-                <div class="contenedor">
-                    <img src="{{ asset('img/min/canciones-Pukllasunchis.webp') }}" alt="Libros Puklla" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Canciones</h2>
-                    <a href="">Ver lista</a>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="contenedor">
-                    <img src="{{ asset('img/min/libros-Pukllasunchis-min.webp') }}" alt="Libros Puklla" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Varios</h2>
-                    <a href="">Ver lista</a>
-                </div>
-            </div>
-            <div class="col-lg-4">
-                <div class="contenedor">
-                    <img src="{{ asset('img/min/videos-otros-Pukllasunchis.webp') }}" alt="Libros Puklla" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Videos otros</h2>
-                    <a href="">Ver lista</a>
+            <div class="col">
+                <div class="contenedor contenedor-placeholder opacity-75">
+                    <img src="{{ asset('img/min/libros-Pukllasunchis-min.webp') }}" alt="" class="img-fluid">
+                    <h2 class="position-absolute text-center text-white">Fotos</h2>
+                    <span class="position-absolute bottom-0 start-50 translate-middle-x mb-3 badge bg-secondary bg-opacity-75 rounded-pill">Próximamente</span>
                 </div>
             </div>
         </div>
+
+        {{-- @if ($sisipediaVideoFiles->isNotEmpty() || $sisipediaVideoAportaciones->isNotEmpty())
+            <section id="home-videos-sisipedia" class="mt-5 pt-2">
+                <div class="col-lg-12 mb-3">
+                    <h2 class="titulosDos mb-1">Videos desde Sisipedia <span class="badge bg-light text-muted border fw-normal ms-1" style="font-size:.65rem;">Drive</span></h2>
+                    <p class="text-muted small mb-0">Archivos de video subidos en registros públicos y en aportaciones.</p>
+                </div>
+                @if ($sisipediaVideoFiles->isNotEmpty())
+                    <h3 class="h6 text-primary fw-bold mb-3"><i class="fa fa-folder-open me-2"></i>Registros de categorías</h3>
+                    <div class="row g-4 mb-5">
+                        @foreach ($sisipediaVideoFiles as $vFile)
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border-0 shadow-sm h-100 overflow-hidden">
+                                    <div class="ratio ratio-16x9 bg-dark">
+                                        <iframe loading="lazy" class="border-0"
+                                            src="{{ \App\Services\GoogleDriveService::getPreviewUrl($vFile->drive_id) }}"
+                                            title="{{ $vFile->nombre_display }}" allowfullscreen></iframe>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <span class="badge bg-primary bg-opacity-10 text-primary border border-primary mb-2">Registro</span>
+                                        <p class="small fw-semibold mb-1 text-dark">{{ $vFile->nombre_display }}</p>
+                                        @if ($vFile->category)
+                                            <a href="{{ route('sisipedia.categories.show', $vFile->category) }}" class="small text-decoration-none">
+                                                <i class="fa fa-link me-1"></i>{{ $vFile->category->name }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                @if ($sisipediaVideoAportaciones->isNotEmpty())
+                    <h3 class="h6 text-warning fw-bold mb-3"><i class="fa fa-users me-2"></i>Aportaciones</h3>
+                    <div class="row g-4 mb-4">
+                        @foreach ($sisipediaVideoAportaciones as $ap)
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border-0 shadow-sm h-100 overflow-hidden border-start border-warning border-3">
+                                    <div class="ratio ratio-16x9 bg-dark">
+                                        <iframe loading="lazy" class="border-0"
+                                            src="{{ \App\Services\GoogleDriveService::getPreviewUrl($ap->video) }}"
+                                            title="{{ $ap->nombre_ol }}" allowfullscreen></iframe>
+                                    </div>
+                                    <div class="card-body p-3">
+                                        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning mb-2">Aportación</span>
+                                        <p class="small fw-semibold mb-1 text-dark">{{ $ap->nombre_ol }}</p>
+                                        @if ($ap->category)
+                                            <a href="{{ route('sisipedia.categories.show', $ap->category) }}" class="small text-decoration-none">
+                                                <i class="fa fa-link me-1"></i>{{ $ap->category->name }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
+        @endif
+
+        @if ($sisipediaAudioFiles->isNotEmpty() || $sisipediaAudioAportaciones->isNotEmpty())
+            <section id="home-audios-sisipedia" class="mt-4 pt-3 border-top">
+                <div class="col-lg-12 mb-3">
+                    <h2 class="titulosDos mb-1">Audios desde Sisipedia</h2>
+                    <p class="text-muted small mb-0">Archivos de audio en registros y en aportaciones (misma distinción que en videos).</p>
+                </div>
+                @if ($sisipediaAudioFiles->isNotEmpty())
+                    <h3 class="h6 text-primary fw-bold mb-3"><i class="fa fa-folder-open me-2"></i>Registros de categorías</h3>
+                    <div class="row g-4 mb-5">
+                        @foreach ($sisipediaAudioFiles as $aFile)
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border-0 shadow-sm h-100">
+                                    <div class="card-body p-3">
+                                        <span class="badge bg-success bg-opacity-10 text-success border border-success mb-2">Registro · Audio</span>
+                                        <iframe loading="lazy" class="w-100 rounded border-0 bg-light"
+                                            style="height:120px;"
+                                            src="{{ \App\Services\GoogleDriveService::getPreviewUrl($aFile->drive_id) }}"
+                                            title="{{ $aFile->nombre_display }}" allowfullscreen></iframe>
+                                        <p class="small fw-semibold mt-2 mb-1">{{ $aFile->nombre_display }}</p>
+                                        @if ($aFile->category)
+                                            <a href="{{ route('sisipedia.categories.show', $aFile->category) }}" class="small text-decoration-none">
+                                                <i class="fa fa-link me-1"></i>{{ $aFile->category->name }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+                @if ($sisipediaAudioAportaciones->isNotEmpty())
+                    <h3 class="h6 text-warning fw-bold mb-3"><i class="fa fa-users me-2"></i>Aportaciones</h3>
+                    <div class="row g-4 mb-4">
+                        @foreach ($sisipediaAudioAportaciones as $ap)
+                            <div class="col-lg-4 col-md-6">
+                                <div class="card border-0 shadow-sm h-100 border-start border-warning border-3">
+                                    <div class="card-body p-3">
+                                        <span class="badge bg-warning bg-opacity-25 text-dark border border-warning mb-2">Aportación · Audio</span>
+                                        <iframe loading="lazy" class="w-100 rounded border-0 bg-light"
+                                            style="height:120px;"
+                                            src="{{ \App\Services\GoogleDriveService::getPreviewUrl($ap->audio) }}"
+                                            title="{{ $ap->nombre_ol }}" allowfullscreen></iframe>
+                                        <p class="small fw-semibold mt-2 mb-1">{{ $ap->nombre_ol }}</p>
+                                        @if ($ap->category)
+                                            <a href="{{ route('sisipedia.categories.show', $ap->category) }}" class="small text-decoration-none">
+                                                <i class="fa fa-link me-1"></i>{{ $ap->category->name }}
+                                            </a>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                @endif
+            </section>
+        @endif --}}
+
+        @include('partials.home-aporte-form')
+
         <div class="row mb-4 mb-2 mt-5">
             <div class="col-lg-12">
                 <h2 class="titulosDos">
-                    Últimas publicaciones Sisichakunay <a href="https://www.facebook.com/Sisichakunaq" class="verMas"
+                    Últimas publicaciones Sisichakunaq <a href="https://www.facebook.com/Sisichakunaq" class="verMas"
                         target="_blank">→ Ver en FaceBook <i class="fab fa-facebook" style="font-size: 15px"></i></a>
                 </h2>
             </div>
@@ -77,7 +189,7 @@
         </div>
         <div class="row">
             <div class="col-lg-12 mt-4 mb-2">
-                <h2 class="titulosDos">Últimas publicaciones Sisichakunay <a target="_blank"
+                <h2 class="titulosDos">Últimas publicaciones Sisichakunaq <a target="_blank"
                         href="https://open.spotify.com/show/21uqGdVqtet2iYx3XkhAVh" class="verMas">→ Ver en Spotify <i
                             class="fab fa-spotify" style="font-size: 15px"></i> </a></h2>
             </div>
@@ -192,7 +304,7 @@
                 </div>
                 <!------Video en Drive--------->
                 @foreach ($videos as $video)
-                    <div class="col-lg-4 p-3">
+                    <div class="col-lg-4 col-md-6 p-3">
                         <div class="cardVideos">
                             <div class="ratio ratio-16x9">
                                 @if ($video->youtube)

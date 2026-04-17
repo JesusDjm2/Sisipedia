@@ -3,7 +3,7 @@
         <div class="category-info">
             @if ($category->children->count())
                 <button class="expand-btn" data-target="children-{{ $category->id }}">
-                    <i class="fa fa-chevron-down"></i>
+                    <i class="fa fa-chevron-right"></i>
                 </button>
             @else
                 <div style="width: 28px;"></div>
@@ -17,12 +17,53 @@
             @endif
             <div class="category-details">
                 <div class="category-name">
-                    <span class="text-primary fw-bold me-2">{{ $category->numbering }}</span>
-                    {{ $category->name }}
+                    <span class="text-primary fw-bold mr-2">{{ $category->numbering }}</span>
+                    <span class="cat-name-text">{{ $category->name }}</span>
                 </div>
                 @if ($category->slug)
                     <div class="category-slug">{{ $category->slug }}</div>
                 @endif
+                {{-- Badges de archivos y aportaciones --}}
+                @php
+                    $catFiles  = $category->relationLoaded('files') ? $category->files : collect();
+                    $aportCount = $aportCounts[$category->id] ?? 0;
+                @endphp
+                <div class="mt-1 d-flex flex-wrap" style="gap:.3rem;">
+                    @if ($catFiles->where('tipo','pdf')->isNotEmpty())
+                        <span class="badge badge-danger" style="font-size:.65rem;">
+                            <i class="fa fa-file-pdf-o mr-1"></i>PDF
+                        </span>
+                    @endif
+                    @if ($catFiles->where('tipo','doc')->isNotEmpty())
+                        <span class="badge badge-secondary" style="font-size:.65rem;">
+                            <i class="fa fa-file-word-o mr-1"></i>Doc
+                        </span>
+                    @endif
+                    @if ($catFiles->where('tipo','audio')->isNotEmpty())
+                        <span class="badge badge-success" style="font-size:.65rem;">
+                            <i class="fa fa-music mr-1"></i>Audio
+                        </span>
+                    @endif
+                    @if ($catFiles->where('tipo','video')->isNotEmpty())
+                        <span class="badge badge-primary" style="font-size:.65rem;">
+                            <i class="fa fa-video-camera mr-1"></i>Video
+                        </span>
+                    @endif
+                    @if ($aportCount > 0)
+                        <span class="badge badge-warning text-dark" style="font-size:.65rem;">
+                            <i class="fa fa-users mr-1"></i>{{ $aportCount }} aportacion{{ $aportCount !== 1 ? 'es' : '' }}
+                        </span>
+                    @else
+                        <span class="badge badge-light text-muted border" style="font-size:.65rem;">
+                            Sin aportaciones
+                        </span>
+                    @endif
+                    @if ($category->children->count())
+                        <span class="badge badge-secondary" style="font-size:.65rem;">
+                            <i class="fa fa-folder-open mr-1"></i>{{ $category->children->count() }} sub-registro{{ $category->children->count() !== 1 ? 's' : '' }}
+                        </span>
+                    @endif
+                </div>
             </div>
             <div class="category-meta">
                 @if ($category->parent)
@@ -73,11 +114,10 @@
     </div>
 
     @if ($category->children->count())
-        <ul id="children-{{ $category->id }}">
+        <ul id="children-{{ $category->id }}" style="display:none;">
             @foreach ($category->children as $child)
                 @include('sisichakuna.categorias.tree-item', ['category' => $child])
             @endforeach
         </ul>
     @endif
 </li>
-

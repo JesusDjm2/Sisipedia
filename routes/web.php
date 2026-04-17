@@ -7,6 +7,7 @@ use App\Http\Controllers\CategoriaController;
 use App\Http\Controllers\EnlacesController;
 use App\Http\Controllers\LibroController;
 use App\Http\Controllers\SeccionController;
+use App\Http\Controllers\sisipedia\AportacionController;
 use App\Http\Controllers\sisipedia\CategoryController;
 use App\Http\Controllers\VideoCategoriaController;
 use App\Http\Controllers\VideoController;
@@ -47,7 +48,7 @@ Route::resource('canciones', CancionesController::class)->names('canciones')->mi
 Route::get('canciones-Puklla', [CancionesController::class, 'canciones'])->name('cancionesPuklla')->middleware('auth');
 
 Route::resource('Dashboard', AdminController::class)->names('admin');
-Route::get('resultados-de-busqueda', [EnlacesController::class, 'busqueda'])->name('busqueda')->middleware('auth');
+Route::get('resultados-de-busqueda', [EnlacesController::class, 'busqueda'])->name('busqueda');
 
 Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
@@ -68,6 +69,32 @@ Route::prefix('sisipedia')->name('sisipedia.')->group(function () {
             ->name('categories.reorder');
         Route::post('categories/{category}/toggle-status', [CategoryController::class, 'toggleStatus'])
             ->name('categories.toggle-status');
+        Route::delete('categories/{category}/files/{file}', [CategoryController::class, 'destroyFile'])
+            ->name('categories.files.destroy');
+    });
+
+    // Aportaciones
+    Route::middleware('auth')->group(function () {
+        Route::get('aportaciones', [AportacionController::class, 'adminIndex'])
+            ->name('aportaciones.index');
+    });
+    // Crear aportación: público (cualquier visitante puede aportar)
+    Route::post('categories/{category}/aportaciones', [AportacionController::class, 'store'])
+        ->name('categories.aportaciones.store');
+
+    Route::post('aportaciones/general', [AportacionController::class, 'storeStandalone'])
+        ->name('aportaciones.general.store');
+
+    // Eliminar: solo admin o sisicha
+    Route::middleware(['auth', 'role:admin|sisicha'])
+        ->delete('categories/{category}/aportaciones/{aportacion}', [AportacionController::class, 'destroy'])
+        ->name('categories.aportaciones.destroy');
+
+    Route::middleware(['auth', 'role:admin|sisicha'])->group(function () {
+        Route::post('aportaciones/{aportacion}/approve', [AportacionController::class, 'approve'])
+            ->name('aportaciones.approve');
+        Route::delete('aportaciones/{aportacion}', [AportacionController::class, 'destroyStandalone'])
+            ->name('aportaciones.destroy');
     });
 
     // Detalle público al final (wildcard {category} no captura rutas fijas de arriba)
@@ -77,6 +104,7 @@ Route::prefix('sisipedia')->name('sisipedia.')->group(function () {
 
 Route::get('sisipedia/registros', [CategoryController::class, 'registros'])->name('public.sisi');
 Route::get('sisipedia/categorias', [CategoryController::class, 'publicIndex'])->name('public.categoria.sisi');
+Route::get('sisipedia/search', [CategoryController::class, 'search'])->name('sisipedia.search');
 
 /* Route::get('/limpiar-cache', function () {
     Artisan::call('cache:clear');

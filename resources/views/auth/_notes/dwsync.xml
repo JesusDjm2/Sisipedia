@@ -3,4 +3,7 @@
 <file name="login.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133970757883437022" remote="133970938800000000" Dst="0" />
 <file name="register.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133621635694988106" remote="133650516600000000" Dst="0" />
 <file name="verify.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133620839823587232" remote="133650516600000000" Dst="0" />
+<file name="login.blade.php" server="ftp.pukllasunchis.org" local="133970759591144855" remote="134209545000000000" Dst="0" />
+<file name="register.blade.php" server="ftp.pukllasunchis.org" local="133741802110000000" remote="134209545000000000" Dst="0" />
+<file name="verify.blade.php" server="ftp.pukllasunchis.org" local="133675207090000000" remote="134209545000000000" Dst="0" />
 </dwsync>

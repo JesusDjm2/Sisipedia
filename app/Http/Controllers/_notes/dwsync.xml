@@ -12,4 +12,17 @@
 <file name="CancionesCategoriaController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801640000000" remote="133927835400000000" Dst="0" />
 <file name="CancionesController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801650000000" remote="133927835400000000" Dst="0" />
 <file name="SisichakunaController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801680000000" remote="133927835400000000" Dst="0" />
+<file name="AdminController.php" server="ftp.pukllasunchis.org" local="133741801600000000" remote="134209262400000000" Dst="0" />
+<file name="CancionesCategoriaController.php" server="ftp.pukllasunchis.org" local="133741801640000000" remote="134209262400000000" Dst="0" />
+<file name="CancionesController.php" server="ftp.pukllasunchis.org" local="133970895592475659" remote="134209262400000000" Dst="0" />
+<file name="CategoriaController.php" server="ftp.pukllasunchis.org" local="133928354346147103" remote="134209262400000000" Dst="0" />
+<file name="Controller.php" server="ftp.pukllasunchis.org" local="133741801650000000" remote="134209262400000000" Dst="0" />
+<file name="EnlacesController.php" server="ftp.pukllasunchis.org" local="134209362780856643" remote="134209545600000000" Dst="0" />
+<file name="HomeController.php" server="ftp.pukllasunchis.org" local="133741801650000000" remote="134209262400000000" Dst="0" />
+<file name="InvestigacionController.php" server="ftp.pukllasunchis.org" local="134188569970872918" remote="134209262400000000" Dst="0" />
+<file name="LibroController.php" server="ftp.pukllasunchis.org" local="133928353260797514" remote="134209262400000000" Dst="0" />
+<file name="SeccionController.php" server="ftp.pukllasunchis.org" local="133927577278099711" remote="134209262400000000" Dst="0" />
+<file name="SisichakunaController.php" server="ftp.pukllasunchis.org" local="133741801680000000" remote="134209262400000000" Dst="0" />
+<file name="VideoController.php" server="ftp.pukllasunchis.org" local="133970834124951846" remote="134209262400000000" Dst="0" />
+<file name="VideoCategoriaController.php" server="ftp.pukllasunchis.org" local="133970895734092448" remote="134209262400000000" Dst="0" />
 </dwsync>

@@ -79,59 +79,58 @@
                             </div>
                         </div>
 
-                        {{-- Archivos multimedia --}}
-                        @if($category->pdf || $category->audio || $category->video)
+                        {{-- Archivos adjuntos --}}
+                        @if($category->files->isNotEmpty())
                             <hr>
                             <div class="row g-3 mt-1">
-
-                                @if($category->pdf)
-                                    <div class="col-12">
-                                        <h6 class="text-muted mb-2"><i class="fa fa-file-pdf text-danger me-1"></i> PDF</h6>
-                                        <iframe src="{{ \App\Services\GoogleDriveService::getPreviewUrl($category->pdf) }}"
-                                                width="100%" height="480" allow="autoplay"
-                                                class="rounded border"></iframe>
-                                        <div class="mt-1">
-                                            <a href="{{ \App\Services\GoogleDriveService::getEmbedUrl($category->pdf) }}"
-                                               class="btn btn-sm btn-outline-danger" target="_blank">
-                                                <i class="fa fa-download me-1"></i> Descargar PDF
-                                            </a>
+                                @foreach($category->files->groupBy('tipo') as $tipo => $archivos)
+                                    @php
+                                        $tipoLabel = ['pdf'=>'PDF','doc'=>'Word','audio'=>'Audio','video'=>'Video'][$tipo] ?? ucfirst($tipo);
+                                        $tipoColor = ['pdf'=>'danger','doc'=>'primary','audio'=>'success','video'=>'warning'][$tipo] ?? 'secondary';
+                                        $tipoIcon  = ['pdf'=>'fa-file-pdf','doc'=>'fa-file-word','audio'=>'fa-music','video'=>'fa-video'][$tipo] ?? 'fa-file';
+                                    @endphp
+                                    @foreach($archivos as $archivo)
+                                        <div class="col-12">
+                                            <h6 class="text-muted mb-2">
+                                                <i class="fa {{ $tipoIcon }} text-{{ $tipoColor }} me-1"></i>
+                                                {{ $tipoLabel }}: <span class="text-dark">{{ $archivo->nombre_display }}</span>
+                                            </h6>
+                                            @php
+                                                $adminPreviewUrl = \App\Services\GoogleDriveService::getPreviewUrl($archivo->drive_id);
+                                                $adminPreviewH = match ($tipo) {
+                                                    'video' => 400,
+                                                    'audio' => 180,
+                                                    default => 480,
+                                                };
+                                            @endphp
+                                            @if(in_array($tipo, ['pdf','video','audio']))
+                                                <div class="sisipedia-file-preview-wrap position-relative bg-light rounded border"
+                                                     data-preview-url="{{ $adminPreviewUrl }}"
+                                                     data-is-video="{{ $tipo === 'video' ? '1' : '0' }}">
+                                                    <div class="sisipedia-preview-placeholder d-flex flex-column align-items-center justify-content-center text-center px-3 py-3"
+                                                         style="min-height: {{ max(120, min($adminPreviewH, 220)) }}px;">
+                                                        <button type="button"
+                                                                class="btn btn-sm btn-outline-{{ $tipoColor }} mb-2 sisipedia-load-category-preview">
+                                                            <i class="fa fa-eye me-1"></i>Ver vista previa
+                                                        </button>
+                                                        <span class="small text-muted">Carga la vista previa solo al pulsar.</span>
+                                                    </div>
+                                                    <iframe title="{{ $archivo->nombre_display }}"
+                                                        class="sisipedia-category-iframe w-100 border-0 d-none rounded"
+                                                        style="height: {{ $adminPreviewH }}px;"
+                                                        loading="lazy"
+                                                        allowfullscreen></iframe>
+                                                </div>
+                                            @endif
+                                            <div class="mt-1">
+                                                <a href="{{ \App\Services\GoogleDriveService::getUrl($archivo->drive_id) }}"
+                                                   class="btn btn-sm btn-outline-{{ $tipoColor }}" target="_blank">
+                                                    <i class="fa fa-download me-1"></i> Descargar
+                                                </a>
+                                            </div>
                                         </div>
-                                    </div>
-                                @endif
-
-                                @if($category->audio)
-                                    <div class="col-12">
-                                        <h6 class="text-muted mb-2"><i class="fa fa-music text-primary me-1"></i> Audio</h6>
-                                        <audio controls class="w-100" style="max-width: 500px;">
-                                            <source src="{{ \App\Services\GoogleDriveService::getEmbedUrl($category->audio) }}">
-                                            Tu navegador no soporta el reproductor de audio.
-                                        </audio>
-                                        <div class="mt-1">
-                                            <a href="{{ \App\Services\GoogleDriveService::getUrl($category->audio) }}"
-                                               class="btn btn-sm btn-outline-primary" target="_blank">
-                                                <i class="fa fa-external-link-alt me-1"></i> Abrir en Drive
-                                            </a>
-                                        </div>
-                                    </div>
-                                @endif
-
-                                @if($category->video)
-                                    <div class="col-12">
-                                        <h6 class="text-muted mb-2"><i class="fa fa-video text-success me-1"></i> Video</h6>
-                                        <div class="ratio ratio-16x9" style="max-width: 720px;">
-                                            <iframe src="{{ \App\Services\GoogleDriveService::getPreviewUrl($category->video) }}"
-                                                    allow="autoplay" allowfullscreen
-                                                    class="rounded border"></iframe>
-                                        </div>
-                                        <div class="mt-1">
-                                            <a href="{{ \App\Services\GoogleDriveService::getUrl($category->video) }}"
-                                               class="btn btn-sm btn-outline-success" target="_blank">
-                                                <i class="fa fa-external-link-alt me-1"></i> Abrir en Drive
-                                            </a>
-                                        </div>
-                                    </div>
-                                @endif
-
+                                    @endforeach
+                                @endforeach
                             </div>
                         @endif
                     </div>
@@ -169,4 +168,26 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest('.sisipedia-load-category-preview');
+            if (!btn) return;
+            e.preventDefault();
+            var wrap = btn.closest('.sisipedia-file-preview-wrap');
+            if (!wrap || wrap.dataset.previewLoaded === '1') return;
+            var iframe = wrap.querySelector('.sisipedia-category-iframe');
+            var url = wrap.dataset.previewUrl;
+            if (!iframe || !url) return;
+            iframe.src = url;
+            if (wrap.dataset.isVideo === '1') {
+                iframe.setAttribute('allow', 'autoplay; fullscreen');
+            }
+            iframe.classList.remove('d-none');
+            iframe.classList.add('d-block');
+            wrap.dataset.previewLoaded = '1';
+            var ph = wrap.querySelector('.sisipedia-preview-placeholder');
+            if (ph) ph.classList.add('d-none');
+        });
+    </script>
 @endsection

@@ -15,20 +15,36 @@
             </div>
 
             <div class="card-body">
-                <!-- Buscador en tiempo real -->
+                <!-- Buscador + controles -->
                 <div class="mb-4">
-                    <div class="input-group">
-                        <span class="input-group-text bg-white">
-                            <i class="fa fa-search text-muted"></i>
-                        </span>
-                        <input type="text" id="searchCategory" class="form-control form-control-sm"
-                            placeholder="Buscar categoría por nombre...">
-                        <button class="btn btn-outline-secondary" type="button" id="clearSearch">
-                            <i class="fa fa-times"></i>
+                    <div class="d-flex flex-wrap" style="gap:.5rem;">
+                        <div class="input-group flex-grow-1" style="min-width:200px;">
+                            <span class="input-group-text bg-white">
+                                <i class="fa fa-search text-muted"></i>
+                            </span>
+                            <input type="text" id="searchCategory" class="form-control form-control-sm"
+                                placeholder="Buscar categoría por nombre o slug...">
+                            <button class="btn btn-outline-secondary" type="button" id="clearSearch">
+                                <i class="fa fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary" id="expandAll" title="Expandir todo">
+                            <i class="fa fa-expand mr-1"></i> Expandir
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="collapseAll" title="Colapsar todo">
+                            <i class="fa fa-compress mr-1"></i> Colapsar
                         </button>
                     </div>
+                    <div class="d-flex flex-wrap mt-2" style="gap:.3rem;">
+                        <small class="text-muted mr-1">Contiene:</small>
+                        <span class="badge badge-danger" style="font-size:.65rem;"><i class="fa fa-file-pdf-o mr-1"></i>PDF</span>
+                        <span class="badge badge-success" style="font-size:.65rem;"><i class="fa fa-music mr-1"></i>Audio</span>
+                        <span class="badge badge-primary" style="font-size:.65rem;"><i class="fa fa-video-camera mr-1"></i>Video</span>
+                        <span class="badge badge-warning text-dark" style="font-size:.65rem;"><i class="fa fa-users mr-1"></i>Aportaciones</span>
+                        <span class="badge badge-secondary" style="font-size:.65rem;"><i class="fa fa-folder-open mr-1"></i>Sub-registros</span>
+                    </div>
                     <small class="text-muted mt-1 d-block">
-                        <i class="fa fa-info-circle"></i> La búsqueda filtrará categorías y mostrará su jerarquía
+                        <i class="fa fa-info-circle"></i> La búsqueda filtrará categorías, resaltará coincidencias y mostrará su jerarquía
                     </small>
                 </div>
                 <!-- Estructura jerárquica de categorías -->
@@ -224,10 +240,47 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const searchInput = document.getElementById('searchCategory');
-            const clearButton = document.getElementById('clearSearch');
+            const searchInput  = document.getElementById('searchCategory');
+            const clearButton  = document.getElementById('clearSearch');
+            const expandAllBtn = document.getElementById('expandAll');
+            const collapseAllBtn = document.getElementById('collapseAll');
             const categoryItems = document.querySelectorAll('.category-item');
             const csrfToken = '{{ csrf_token() }}';
+
+            // ── Expand / Collapse helpers ──────────────────────────────
+            function setUlState(ul, expanded) {
+                ul.style.display = expanded ? '' : 'none';
+                const btn = document.querySelector(`.expand-btn[data-target="${ul.id}"]`);
+                if (!btn) return;
+                const icon = btn.querySelector('i');
+                icon.classList.toggle('fa-chevron-down',  expanded);
+                icon.classList.toggle('fa-chevron-right', !expanded);
+            }
+
+            expandAllBtn.addEventListener('click', () => {
+                document.querySelectorAll('.category-tree ul[id]').forEach(ul => setUlState(ul, true));
+            });
+            collapseAllBtn.addEventListener('click', () => {
+                document.querySelectorAll('.category-tree ul[id]').forEach(ul => setUlState(ul, false));
+            });
+
+            // ── Word highlight ─────────────────────────────────────────
+            function highlight(el, term) {
+                if (!el) return;
+                if (!el.dataset.origHtml) el.dataset.origHtml = el.innerHTML;
+                const esc = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                el.innerHTML = el.dataset.origHtml.replace(
+                    new RegExp(`(${esc})`, 'gi'),
+                    '<mark style="background:#fff176;padding:0 2px;border-radius:3px;font-weight:inherit;">$1</mark>'
+                );
+            }
+
+            function clearHighlights() {
+                document.querySelectorAll('[data-orig-html]').forEach(el => {
+                    el.innerHTML = el.dataset.origHtml;
+                    delete el.dataset.origHtml;
+                });
+            }
 
             function submitPostForm(action, method = null) {
                 const form = document.createElement('form');
@@ -252,19 +305,19 @@
                 form.submit();
             }
 
-            // Función para buscar y filtrar
+            // ── Filter + highlight ─────────────────────────────────────
             function filterCategories(searchTerm) {
+                clearHighlights();
+                const existingNoResults = document.querySelector('.no-results');
+
                 if (!searchTerm.trim()) {
-                    // Mostrar todo y limpiar highlights
+                    // Restore: show all items, collapse all ULs back to default
                     categoryItems.forEach(item => {
                         item.classList.remove('has-search-match');
                         item.closest('li').style.display = '';
                     });
-
-                    // Mostrar todos los ULs
-                    document.querySelectorAll('.category-tree ul').forEach(ul => {
-                        ul.style.display = '';
-                    });
+                    document.querySelectorAll('.category-tree ul[id]').forEach(ul => setUlState(ul, false));
+                    if (existingNoResults) existingNoResults.style.display = 'none';
                     return;
                 }
 
@@ -272,51 +325,45 @@
                 let hasMatches = false;
 
                 categoryItems.forEach(item => {
-                    const categoryName = item.querySelector('.category-name')?.textContent.toLowerCase() ||
-                        '';
-                    const categorySlug = item.querySelector('.category-slug')?.textContent.toLowerCase() ||
-                        '';
-                    const matches = categoryName.includes(termLower) || categorySlug.includes(termLower);
+                    const nameEl = item.querySelector('.cat-name-text');
+                    const slugEl = item.querySelector('.category-slug');
+                    const nameText = (nameEl?.textContent || '').toLowerCase();
+                    const slugText = (slugEl?.textContent || '').toLowerCase();
+                    const matches  = nameText.includes(termLower) || slugText.includes(termLower);
 
                     if (matches) {
                         hasMatches = true;
                         item.classList.add('has-search-match');
-                        // Mostrar el item y todos sus padres
-                        let parent = item.closest('li');
-                        while (parent) {
-                            parent.style.display = '';
-                            // Expandir los padres para mostrar el item encontrado
-                            const parentUl = parent.querySelector('ul');
-                            if (parentUl) {
-                                parentUl.style.display = '';
-                            }
-                            parent = parent.parentElement?.closest('li');
+                        highlight(nameEl, searchTerm.trim());
+                        highlight(slugEl, searchTerm.trim());
+
+                        // Show this li and expand all ancestor ULs
+                        let li = item.closest('li');
+                        while (li) {
+                            li.style.display = '';
+                            const parentUl = li.parentElement;
+                            if (parentUl && parentUl.id) setUlState(parentUl, true);
+                            li = parentUl?.closest('li');
                         }
                     } else {
                         item.classList.remove('has-search-match');
-                        // Ocultar el item
                         item.closest('li').style.display = 'none';
                     }
                 });
 
-                // Mostrar mensaje si no hay resultados
-                const existingNoResults = document.querySelector('.no-results');
-                if (!hasMatches && searchTerm.trim()) {
+                // No-results message
+                if (!hasMatches) {
                     if (!existingNoResults) {
-                        const noResultsDiv = document.createElement('div');
-                        noResultsDiv.className = 'no-results';
-                        noResultsDiv.innerHTML = `
-                        <i class="fas fa-search fa-3x mb-3"></i>
-                        <p>No se encontraron categorías con "<strong>${searchTerm}</strong>"</p>
-                        <small class="text-muted">Intenta con otro término de búsqueda</small>
-                    `;
-                        document.getElementById('categoryTree').appendChild(noResultsDiv);
+                        const div = document.createElement('div');
+                        div.className = 'no-results';
+                        div.innerHTML = `<i class="fa fa-search fa-3x mb-3"></i>
+                            <p>No se encontraron categorías con "<strong>${searchTerm}</strong>"</p>
+                            <small class="text-muted">Intenta con otro término de búsqueda</small>`;
+                        document.getElementById('categoryTree').appendChild(div);
                     } else {
-                        existingNoResults.innerHTML = `
-                        <i class="fas fa-search fa-3x mb-3"></i>
-                        <p>No se encontraron categorías con "<strong>${searchTerm}</strong>"</p>
-                        <small class="text-muted">Intenta con otro término de búsqueda</small>
-                    `;
+                        existingNoResults.innerHTML = `<i class="fa fa-search fa-3x mb-3"></i>
+                            <p>No se encontraron categorías con "<strong>${searchTerm}</strong>"</p>
+                            <small class="text-muted">Intenta con otro término de búsqueda</small>`;
                         existingNoResults.style.display = '';
                     }
                 } else if (existingNoResults) {
@@ -328,9 +375,7 @@
             let searchTimeout;
             searchInput.addEventListener('input', function(e) {
                 clearTimeout(searchTimeout);
-                searchTimeout = setTimeout(() => {
-                    filterCategories(e.target.value);
-                }, 300);
+                searchTimeout = setTimeout(() => filterCategories(e.target.value), 300);
             });
 
             // Botón limpiar búsqueda
@@ -340,25 +385,12 @@
                 searchInput.focus();
             });
 
-            // Funcionalidad expandir/colapsar
+            // ── Expand / collapse individual ───────────────────────────
             document.querySelectorAll('.expand-btn').forEach(btn => {
                 btn.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    const targetId = this.dataset.target;
-                    const targetUl = document.getElementById(targetId);
-                    const icon = this.querySelector('i');
-
-                    if (targetUl) {
-                        if (targetUl.style.display === 'none') {
-                            targetUl.style.display = '';
-                            icon.classList.remove('fa-chevron-right');
-                            icon.classList.add('fa-chevron-down');
-                        } else {
-                            targetUl.style.display = 'none';
-                            icon.classList.remove('fa-chevron-down');
-                            icon.classList.add('fa-chevron-right');
-                        }
-                    }
+                    const targetUl = document.getElementById(this.dataset.target);
+                    if (targetUl) setUlState(targetUl, targetUl.style.display === 'none');
                 });
             });
 

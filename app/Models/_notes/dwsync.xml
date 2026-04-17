@@ -9,4 +9,16 @@
 <file name="VideoCategoria.php" server="ftp.eesppukllasunchis.edu.pe" local="133643298587360541" remote="133645206000000000" Dst="0" />
 <file name="Canciones.php" server="ftp.eesppukllasunchis.edu.pe" local="133645139549731750" remote="133650517800000000" Dst="0" />
 <file name="CancionesCategoria.php" server="ftp.eesppukllasunchis.edu.pe" local="133645109651036293" remote="133650517800000000" Dst="0" />
+<file name="Admin.php" server="ftp.pukllasunchis.org" local="133741801770000000" remote="134209262400000000" Dst="0" />
+<file name="Categoria.php" server="ftp.pukllasunchis.org" local="133741801780000000" remote="134209262400000000" Dst="0" />
+<file name="Investigacion.php" server="ftp.pukllasunchis.org" local="134178252637273338" remote="134209262400000000" Dst="0" />
+<file name="Canciones.php" server="ftp.pukllasunchis.org" local="133741801780000000" remote="134209262400000000" Dst="0" />
+<file name="CancionesCategoria.php" server="ftp.pukllasunchis.org" local="133741801780000000" remote="134209262400000000" Dst="0" />
+<file name="InvestigacionArchivo.php" server="ftp.pukllasunchis.org" local="134142836298957895" remote="134209262400000000" Dst="0" />
+<file name="Libro.php" server="ftp.pukllasunchis.org" local="133741801790000000" remote="134209262400000000" Dst="0" />
+<file name="Seccion.php" server="ftp.pukllasunchis.org" local="133741801790000000" remote="134209262400000000" Dst="0" />
+<file name="Sisichakuna.php" server="ftp.pukllasunchis.org" local="133741801790000000" remote="134209262400000000" Dst="0" />
+<file name="Video.php" server="ftp.pukllasunchis.org" local="133741801800000000" remote="134209263000000000" Dst="0" />
+<file name="User.php" server="ftp.pukllasunchis.org" local="133741801800000000" remote="134209263000000000" Dst="0" />
+<file name="VideoCategoria.php" server="ftp.pukllasunchis.org" local="133741801800000000" remote="134209263000000000" Dst="0" />
 </dwsync>

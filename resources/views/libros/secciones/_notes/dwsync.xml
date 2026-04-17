@@ -4,4 +4,8 @@
 <file name="edit.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133675207240000000" remote="133927836000000000" Dst="0" />
 <file name="index.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133927578758671883" remote="133927836000000000" Dst="0" />
 <file name="show.blade.php" server="ftp.eesppukllasunchis.edu.pe" local="133927672369339701" remote="133927885800000000" Dst="0" />
+<file name="create.blade.php" server="ftp.pukllasunchis.org" local="133675207240000000" remote="134209545000000000" Dst="0" />
+<file name="index.blade.php" server="ftp.pukllasunchis.org" local="133927578758671883" remote="134209545000000000" Dst="0" />
+<file name="edit.blade.php" server="ftp.pukllasunchis.org" local="133675207240000000" remote="134209545000000000" Dst="0" />
+<file name="show.blade.php" server="ftp.pukllasunchis.org" local="133927672369339701" remote="134209545000000000" Dst="0" />
 </dwsync>

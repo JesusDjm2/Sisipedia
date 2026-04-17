@@ -15,9 +15,6 @@ class Category extends Model
         'slug',
         'description',
         'image',
-        'pdf',
-        'audio',
-        'video',
         'parent_id',
         'order',
         'is_active',
@@ -42,6 +39,21 @@ class Category extends Model
     public function parent()
     {
         return $this->belongsTo(Category::class, 'parent_id');
+    }
+
+    public function files()
+    {
+        return $this->hasMany(CategoryFile::class)->orderBy('orden');
+    }
+
+    public function filesByType(string $tipo)
+    {
+        return $this->files()->where('tipo', $tipo)->get();
+    }
+
+    public function aportaciones()
+    {
+        return $this->hasMany(Aportacion::class)->latest();
     }
 
     public function children()

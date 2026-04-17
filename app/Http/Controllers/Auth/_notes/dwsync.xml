@@ -6,4 +6,10 @@
 <file name="ResetPasswordController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801630000000" remote="133927835400000000" Dst="0" />
 <file name="ForgotPasswordController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801620000000" remote="133927835400000000" Dst="0" />
 <file name="VerificationController.php" server="ftp.eesppukllasunchis.edu.pe" local="133741801640000000" remote="133927835400000000" Dst="0" />
+<file name="ConfirmPasswordController.php" server="ftp.pukllasunchis.org" local="133741801620000000" remote="134209262400000000" Dst="0" />
+<file name="ForgotPasswordController.php" server="ftp.pukllasunchis.org" local="133741801620000000" remote="134209262400000000" Dst="0" />
+<file name="LoginController.php" server="ftp.pukllasunchis.org" local="134209313873022426" remote="134209545600000000" Dst="0" />
+<file name="RegisterController.php" server="ftp.pukllasunchis.org" local="133741801630000000" remote="134209262400000000" Dst="0" />
+<file name="ResetPasswordController.php" server="ftp.pukllasunchis.org" local="133741801630000000" remote="134209262400000000" Dst="0" />
+<file name="VerificationController.php" server="ftp.pukllasunchis.org" local="133741801640000000" remote="134209262400000000" Dst="0" />
 </dwsync>
