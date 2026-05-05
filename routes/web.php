@@ -93,6 +93,8 @@ Route::prefix('sisipedia')->name('sisipedia.')->group(function () {
     Route::middleware(['auth', 'role:admin|sisicha'])->group(function () {
         Route::post('aportaciones/{aportacion}/approve', [AportacionController::class, 'approve'])
             ->name('aportaciones.approve');
+        Route::patch('aportaciones/{aportacion}', [AportacionController::class, 'update'])
+            ->name('aportaciones.update');
         Route::delete('aportaciones/{aportacion}', [AportacionController::class, 'destroyStandalone'])
             ->name('aportaciones.destroy');
     });

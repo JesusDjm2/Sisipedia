@@ -40,6 +40,9 @@
         </div>
 
         @role('sisicha')
+            <div class="col-lg-12 px-3 pt-0">
+                @include('sisichakuna.partials.sisipedia-admin-nav', ['active' => 'home'])
+            </div>
             <div class="col-lg-3 p-3">
                 <a href="{{ route('sisipedia.categories.index') }}">
                     <img src="{{ asset('img/Sisichakuna.webp') }}" width="100%" loading="lazy">
@@ -60,11 +63,13 @@
                             $recientes = \App\Models\sisipedia\Aportacion::with('category')
                                 ->latest()->limit(6)->get();
                             $rolColors = [
+                                'Equipo Puklla'   => 'info',
                                 'Docente'         => 'primary',
                                 'Líder'           => 'success',
                                 'Niño/Estudiante' => 'warning',
                             ];
                             $rolIcons = [
+                                'Equipo Puklla'   => 'fa-users',
                                 'Docente'         => 'fa-graduation-cap',
                                 'Líder'           => 'fa-star',
                                 'Niño/Estudiante' => 'fa-child',
@@ -94,7 +99,7 @@
                                         <td class="align-middle">
                                             <span class="badge badge-{{ $rolColors[$ap->rol_nombre] ?? 'secondary' }}">
                                                 <i class="fa {{ $rolIcons[$ap->rol_nombre] ?? 'fa-user' }} mr-1"></i>
-                                                {{ $ap->rol_nombre }}
+                                                {{ \App\Models\sisipedia\Aportacion::etiquetaRol($ap->rol_nombre) }}
                                             </span>
                                         </td>
                                         <td class="align-middle small text-muted">

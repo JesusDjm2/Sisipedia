@@ -10,14 +10,17 @@ use Illuminate\Http\Request;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rules\File;
 
 class AportacionController extends Controller
 {
-    public function __construct(private GoogleDriveService $drive) {}
+    public function __construct(private GoogleDriveService $drive)
+    {
+    }
 
     public function adminIndex(Request $request)
     {
-        $roles      = Aportacion::ROLES;
+        $roles = Aportacion::ROLES;
         $categories = Category::orderBy('name')->get(['id', 'name', 'parent_id']);
 
         $query = Aportacion::with('category.parent.parent')
@@ -60,12 +63,64 @@ class AportacionController extends Controller
             ->where('is_approved', false)
             ->count();
 
+        $categoryPickerRows = $this->categoriesForPicker();
+
         return view('sisichakuna.aportaciones.index', compact(
-            'aportaciones', 'roles', 'categories', 'totals', 'pendientesGeneral'
+            'aportaciones', 'roles', 'categories', 'totals', 'pendientesGeneral', 'categoryPickerRows'
         ));
     }
 
-    /** Aporte ligado a un registro (categoría) — solo roles sin “Equipo Puklla”. */
+    /**
+     * Lista plana ordenada en profundidad primero, con ruta completa para el selector del modal.
+     *
+     * @return array<int, array{id:int, name:string, depth:int, path_label:string, search_blob:string, is_root:bool}>
+     */
+    private function categoriesForPicker(): array
+    {
+        $all = Category::query()
+            ->orderBy('order')
+            ->orderBy('name')
+            ->get(['id', 'name', 'parent_id']);
+
+        $byId = $all->keyBy('id');
+
+        $pathFor = function ($cat) use ($byId): string {
+            $parts = [];
+            $current = $cat;
+            $guard = 0;
+            while ($current && $guard++ < 64) {
+                array_unshift($parts, $current->name);
+                $pid = $current->parent_id;
+                $current = $pid ? $byId->get($pid) : null;
+            }
+
+            return implode(' › ', $parts);
+        };
+
+        $byParent = $all->groupBy(fn ($c) => $c->parent_id ?? 0);
+
+        $rows = [];
+        $walk = function (int $parentKey, int $depth) use (&$walk, &$rows, $byParent, $pathFor): void {
+            foreach ($byParent->get($parentKey, collect()) as $cat) {
+                $pathLabel = $pathFor($cat);
+                $rows[] = [
+                    'id' => $cat->id,
+                    'name' => $cat->name,
+                    'depth' => $depth,
+                    'path_label' => $pathLabel,
+                    'search_blob' => mb_strtolower($pathLabel.' '.$cat->name),
+                    'is_root' => $depth === 0,
+                ];
+                $walk((int) $cat->id, $depth + 1);
+            }
+        };
+
+        $walk(0, 0);
+
+        return $rows;
+    }
+
+    /** Aporte ligado a un registro (categoría); mismos roles que en la portada. */
     public function store(Request $request, Category $category)
     {
         if (
@@ -82,15 +137,15 @@ class AportacionController extends Controller
         $rolesCat = implode(',', Aportacion::ROLES_CON_REGISTRO);
 
         $request->validate([
-            'rol_nombre'  => "required|in:{$rolesCat}",
-            'nombre_ol'   => 'required|string|max:255',
+            'rol_nombre' => "required|in:{$rolesCat}",
+            'nombre_ol' => 'required|string|max:255',
             'institucion' => 'nullable|string|max:255',
-            'ubicacion'   => 'nullable|string|max:255',
-            'detalle'     => 'nullable|string',
-            'pdf'         => 'nullable|file|mimes:pdf|max:20480',
-            'doc'         => 'nullable|file|mimes:doc,docx|max:20480',
-            'audio'       => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
-            'video'       => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-mp4,video/mpeg|max:204800',
+            'ubicacion' => 'nullable|string|max:255',
+            'detalle' => 'nullable|string',
+            'pdf' => 'nullable|file|mimes:pdf|max:20480',
+            'doc' => ['nullable', File::types(['doc', 'docx'])->max(20480)],
+            'audio' => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-mp4,video/mpeg|max:204800',
         ]);
 
         $data = $request->only(['rol_nombre', 'nombre_ol', 'institucion', 'ubicacion', 'detalle']);
@@ -125,15 +180,15 @@ class AportacionController extends Controller
         $roles = implode(',', Aportacion::ROLES);
 
         $validator = Validator::make($request->all(), [
-            'rol_nombre'  => "required|in:{$roles}",
-            'nombre_ol'   => 'required|string|max:255',
+            'rol_nombre' => "required|in:{$roles}",
+            'nombre_ol' => 'required|string|max:255',
             'institucion' => 'nullable|string|max:255',
-            'ubicacion'   => 'nullable|string|max:255',
-            'detalle'     => 'nullable|string',
-            'pdf'         => 'nullable|file|mimes:pdf|max:20480',
-            'doc'         => 'nullable|file|mimes:doc,docx|max:20480',
-            'audio'       => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
-            'video'       => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-mp4,video/mpeg|max:204800',
+            'ubicacion' => 'nullable|string|max:255',
+            'detalle' => 'nullable|string',
+            'pdf' => 'nullable|file|mimes:pdf|max:20480',
+            'doc' => ['nullable', File::types(['doc', 'docx'])->max(20480)],
+            'audio' => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
+            'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-mp4,video/mpeg|max:204800',
         ]);
 
         if ($validator->fails()) {
@@ -161,11 +216,41 @@ class AportacionController extends Controller
             );
     }
 
-    public function approve(Aportacion $aportacion)
+    public function update(Request $request, Aportacion $aportacion)
     {
-        $aportacion->update(['is_approved' => true]);
+        $roles = implode(',', Aportacion::ROLES);
 
-        return back()->with('success', 'Aportación aprobada.');
+        $validated = $request->validate([
+            'nombre_ol'   => 'required|string|max:255',
+            'rol_nombre'  => "required|in:{$roles}",
+            'institucion' => 'nullable|string|max:255',
+            'ubicacion'   => 'nullable|string|max:255',
+            'detalle'     => 'nullable|string',
+            'category_id' => 'nullable|exists:categories,id',
+        ]);
+
+        $aportacion->update($validated);
+
+        return back()->with('success', 'Aportación actualizada correctamente.');
+    }
+
+    public function approve(Request $request, Aportacion $aportacion)
+    {
+        $categoryId = $aportacion->category_id;
+
+        if ($aportacion->category_id === null) {
+            $validated = $request->validate([
+                'category_id' => 'required|exists:categories,id',
+            ]);
+            $categoryId = (int) $validated['category_id'];
+        }
+
+        $aportacion->update([
+            'is_approved' => true,
+            'category_id' => $categoryId,
+        ]);
+
+        return back()->with('success', 'Aportación aprobada y vinculada al registro elegido.');
     }
 
     private function uploadArchivos(Request $request, string $prefix): array

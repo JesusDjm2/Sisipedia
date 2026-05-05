@@ -312,9 +312,24 @@
                             {{-- Paso 1: Selector de rol --}}
                             <div id="rolSelector" class="px-3 px-md-4 pt-3 pb-2" style="display:none;">
                                 <p class="fw-semibold mb-3 text-center">¿Cómo deseas aportar?</p>
-                                <div class="row g-3 justify-content-center mb-3">
+                                <div class="row row-cols-2 row-cols-lg-4 g-3 justify-content-center mb-3">
+                                    {{-- Equipo Puklla --}}
+                                    <div class="col">
+                                        <div class="card border-2 rounded-4 text-center p-3 h-100 rol-card"
+                                             style="cursor:pointer; border-color:#6f42c1 !important; transition: transform .15s, box-shadow .15s;"
+                                             onclick="seleccionarRol('Equipo Puklla')">
+                                            <div class="mb-2">
+                                                <span class="d-inline-flex align-items-center justify-content-center rounded-circle text-white"
+                                                      style="width:56px;height:56px;background:#6f42c1;">
+                                                    <i class="fa fa-users fa-lg"></i>
+                                                </span>
+                                            </div>
+                                            <div class="fw-bold fs-6">Equipo Puklla</div>
+                                            <small class="text-muted">Institucional</small>
+                                        </div>
+                                    </div>
                                     {{-- Docente --}}
-                                    <div class="col-12 col-sm-4">
+                                    <div class="col">
                                         <div class="card border-2 rounded-4 text-center p-3 h-100 rol-card"
                                              style="cursor:pointer; border-color:#0d6efd !important; transition: transform .15s, box-shadow .15s;"
                                              onclick="seleccionarRol('Docente')">
@@ -328,8 +343,8 @@
                                             <small class="text-muted">Aporto como educador</small>
                                         </div>
                                     </div>
-                                    {{-- Líder --}}
-                                    <div class="col-12 col-sm-4">
+                                    {{-- Lidereza/Líder --}}
+                                    <div class="col">
                                         <div class="card border-2 rounded-4 text-center p-3 h-100 rol-card"
                                              style="cursor:pointer; border-color:#198754 !important; transition: transform .15s, box-shadow .15s;"
                                              onclick="seleccionarRol('Líder')">
@@ -339,12 +354,12 @@
                                                     <i class="fa fa-star fa-lg"></i>
                                                 </span>
                                             </div>
-                                            <div class="fw-bold fs-6">Líder</div>
-                                            <small class="text-muted">Aporto como líder comunitario</small>
+                                            <div class="fw-bold fs-6">{{ \App\Models\sisipedia\Aportacion::ROL_LIDER_ETIQUETA }}</div>
+                                            <small class="text-muted">Comunidad</small>
                                         </div>
                                     </div>
                                     {{-- Niño/Estudiante --}}
-                                    <div class="col-12 col-sm-4">
+                                    <div class="col">
                                         <div class="card border-2 rounded-4 text-center p-3 h-100 rol-card"
                                              style="cursor:pointer; border-color:#fd7e14 !important; transition: transform .15s, box-shadow .15s;"
                                              onclick="seleccionarRol('Niño/Estudiante')">
@@ -398,19 +413,19 @@
                                     <input type="hidden" name="rol_nombre" id="inputRolNombre"
                                            value="{{ old('rol_nombre') }}">
                                     <div class="row g-3 mb-3">
-                                        <div class="col-md-6">
-                                            <label class="form-label fw-semibold">Nombre en lengua original <span class="text-danger">*</span></label>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Nombre completo:<span class="text-danger">*</span></label>
                                             <input type="text" name="nombre_ol" class="form-control @error('nombre_ol') is-invalid @enderror"
                                                    value="{{ old('nombre_ol') }}" required>
                                             @error('nombre_ol')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">Institución</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Institución:</label>
                                             <input type="text" name="institucion" class="form-control @error('institucion') is-invalid @enderror"
                                                    value="{{ old('institucion') }}">
                                         </div>
-                                        <div class="col-md-3">
-                                            <label class="form-label fw-semibold">Ubicación</label>
+                                        <div class="col-md-4">
+                                            <label class="form-label fw-semibold">Ubicación:</label>
                                             <input type="text" name="ubicacion" class="form-control @error('ubicacion') is-invalid @enderror"
                                                    value="{{ old('ubicacion') }}">
                                         </div>
@@ -477,12 +492,14 @@
                                                         @if($aportacion->rol_nombre)
                                                             @php
                                                                 $rolColor = match($aportacion->rol_nombre) {
+                                                                    'Equipo Puklla'   => 'info',
                                                                     'Docente'         => 'primary',
                                                                     'Líder'           => 'success',
                                                                     'Niño/Estudiante' => 'warning',
                                                                     default           => 'secondary',
                                                                 };
                                                                 $rolIcono = match($aportacion->rol_nombre) {
+                                                                    'Equipo Puklla'   => 'fa-users',
                                                                     'Docente'         => 'fa-chalkboard-teacher',
                                                                     'Líder'           => 'fa-star',
                                                                     'Niño/Estudiante' => 'fa-child',
@@ -490,7 +507,7 @@
                                                                 };
                                                             @endphp
                                                             <span class="badge bg-{{ $rolColor }} bg-opacity-10 text-{{ $rolColor }} border border-{{ $rolColor }}">
-                                                                <i class="fa {{ $rolIcono }} me-1"></i>{{ $aportacion->rol_nombre }}
+                                                                <i class="fa {{ $rolIcono }} me-1"></i>{{ \App\Models\sisipedia\Aportacion::etiquetaRol($aportacion->rol_nombre) }}
                                                             </span>
                                                         @endif
                                                     </div>
@@ -591,9 +608,16 @@
 
                 <script>
                     const rolColors = {
+                        'Equipo Puklla':   '#6f42c1',
                         'Docente':         '#0d6efd',
                         'Líder':           '#198754',
                         'Niño/Estudiante': '#fd7e14',
+                    };
+                    const rolTextoMostrar = {
+                        'Equipo Puklla': 'Equipo Puklla',
+                        'Docente': 'Docente',
+                        'Líder': @json(\App\Models\sisipedia\Aportacion::ROL_LIDER_ETIQUETA),
+                        'Niño/Estudiante': 'Niño/Estudiante',
                     };
 
                     function mostrarRoles() {
@@ -604,7 +628,7 @@
 
                     function seleccionarRol(rol) {
                         document.getElementById('inputRolNombre').value = rol;
-                        document.getElementById('rolTexto').textContent  = rol;
+                        document.getElementById('rolTexto').textContent  = rolTextoMostrar[rol] ?? rol;
                         document.getElementById('rolBadge').style.background = rolColors[rol] ?? '#6c757d';
                         document.getElementById('rolSelector').style.display = 'none';
                         document.getElementById('formAportacionWrap').style.display = 'block';

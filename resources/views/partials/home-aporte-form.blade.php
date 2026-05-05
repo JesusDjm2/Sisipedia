@@ -80,7 +80,7 @@
                                     style="width:52px;height:52px;">
                                     <i class="fa fa-star"></i>
                                 </span>
-                                <div class="fw-bold small">Líder</div>
+                                <div class="fw-bold small">{{ \App\Models\sisipedia\Aportacion::ROL_LIDER_ETIQUETA }}</div>
                                 <small class="text-muted" style="font-size:.7rem;">Comunidad</small>
                             </div>
                         </div>
@@ -120,7 +120,7 @@
                         <input type="hidden" name="rol_nombre" id="homeInputRolNombre" value="{{ old('rol_nombre') }}">
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nombre en lengua original <span
+                                <label class="form-label fw-semibold">Nombre completo:<span
                                         class="text-danger">*</span></label>
                                 <input type="text" name="nombre_ol" required
                                     class="form-control @error('nombre_ol') is-invalid @enderror"
@@ -172,6 +172,53 @@
             </div>
         </div>
     </div>
+
+    @isset($ultimosAportes)
+        @if ($ultimosAportes->isNotEmpty())
+            <div class="row justify-content-center mt-4 pt-3">
+                <div class="col-lg-12">
+                    <h3 class="h6 fw-bold text-secondary mb-3">
+                        <i class="fa-solid fa-clock me-2 text-primary"></i>Últimas aportaciones aprobadas
+                    </h3>
+                    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
+                        @foreach ($ultimosAportes as $uap)
+                            @php
+                                $uColor = match ($uap->rol_nombre) {
+                                    'Equipo Puklla' => 'info',
+                                    'Docente' => 'primary',
+                                    'Líder' => 'success',
+                                    'Niño/Estudiante' => 'warning',
+                                    default => 'secondary',
+                                };
+                            @endphp
+                            <div class="col">
+                                <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-4 border-{{ $uColor }}">
+                                    <div class="card-body p-3">
+                                        <div class="fw-semibold small text-dark mb-1 text-truncate" title="{{ $uap->nombre_ol }}">
+                                            {{ $uap->nombre_ol }}
+                                        </div>
+                                        <span class="badge bg-{{ $uColor }} bg-opacity-10 text-{{ $uColor }} border border-{{ $uColor }} mb-2" style="font-size:.65rem;">
+                                            {{ \App\Models\sisipedia\Aportacion::etiquetaRol($uap->rol_nombre) }}
+                                        </span>
+                                        @if ($uap->category)
+                                            <a href="{{ route('sisipedia.categories.show', $uap->category) }}" class="d-block small text-decoration-none text-truncate" title="{{ $uap->category->name }}">
+                                                <i class="fa fa-folder-open me-1"></i>{{ $uap->category->name }}
+                                            </a>
+                                        @else
+                                            <span class="small text-muted">Sin registro vinculado</span>
+                                        @endif
+                                        <div class="text-muted mt-2" style="font-size:.7rem;">
+                                            {{ $uap->created_at->format('d/m/Y') }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        @endif
+    @endisset
 </section>
 
 <script>
@@ -182,6 +229,12 @@
         'Líder': '#198754',
         'Niño/Estudiante': '#fd7e14',
     };
+    const homeRolTextoMostrar = {
+        'Equipo Puklla': 'Equipo Puklla',
+        'Docente': 'Docente',
+        'Líder': @json(\App\Models\sisipedia\Aportacion::ROL_LIDER_ETIQUETA),
+        'Niño/Estudiante': 'Niño/Estudiante',
+    };
 
     window.homeMostrarRoles = function () {
         document.getElementById('homeRolSelector').classList.remove('d-none');
@@ -191,7 +244,7 @@
 
     window.homeSeleccionarRol = function (rol) {
         document.getElementById('homeInputRolNombre').value = rol;
-        document.getElementById('homeRolTexto').textContent = rol;
+        document.getElementById('homeRolTexto').textContent = homeRolTextoMostrar[rol] ?? rol;
         document.getElementById('homeRolBadge').style.background = homeRolColors[rol] ?? '#6c757d';
         document.getElementById('homeRolSelector').classList.add('d-none');
         document.getElementById('homeFormAportacionWrap').classList.remove('d-none');

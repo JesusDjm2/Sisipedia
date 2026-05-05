@@ -39,4 +39,5 @@
 <file name="2026_04_16_165824_add_rol_nombre_to_aportaciones_table.php" server="ftp.pukllasunchis.org" local="134208323120379303" remote="134209263000000000" Dst="0" />
 <file name="2026_04_17_000001_create_category_files_table.php" server="ftp.pukllasunchis.org" local="134209183846878908" remote="134209487400000000" Dst="0" />
 <file name="2026_04_17_180000_make_aportaciones_category_nullable_and_add_approval.php" server="ftp.pukllasunchis.org" local="134209362239998161" remote="134209545600000000" Dst="0" />
+<file name="2026_04_20_120000_alter_aportaciones_rol_nombre_to_varchar.php" server="ftp.pukllasunchis.org" local="134211665479348972" remote="134211857400000000" Dst="0" />
 </dwsync>

@@ -1,17 +1,16 @@
 @extends('layouts.app')
 @section('titulo', 'Editar Categoría')
 @section('contenido')
-    <div class="container-fluid py-4">
+    @include('sisichakuna.partials.sisipedia-admin-nav', ['active' => 'categories'])
+    <div class="container-fluid py-4 px-0">
         <div class="row">
             <div class="col-md-10 mx-auto">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Editar Categoría: {{ $category->name }}</h3>
-                        <div class="card-tools">
-                            <a href="{{ route('sisipedia.categories.index') }}" class="btn btn-secondary btn-sm">
-                                <i class="fa fa-arrow-left"></i> Volver
-                            </a>
-                        </div>
+                <div class="card border-0 shadow-sm">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h3 class="card-title mb-0">Editar registro: {{ $category->name }}</h3>
+                        <a href="{{ route('sisipedia.categories.index') }}" class="btn btn-outline-secondary btn-sm">
+                            <i class="fa fa-arrow-left"></i> Volver al listado
+                        </a>
                     </div>
 
                     <form action="{{ route('sisipedia.categories.update', $category) }}" method="POST" enctype="multipart/form-data">

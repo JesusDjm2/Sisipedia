@@ -1,19 +1,25 @@
 @extends('layouts.app')
 @section('titulo', 'Categorías')
 @section('contenido')
-    <div class="container-fluid py-4">
-        <div class="card">
-            <div class="card-header">
+    @include('sisichakuna.partials.sisipedia-admin-nav', ['active' => 'categories'])
+    <div class="container-fluid py-0 px-0">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-header bg-white py-3">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h3 class="card-title mb-0">
-                        <i class="fa fa-sitemap me-2"></i> Estructura Sisipedia
-                    </h3>
+                    <div>
+                        <h4 class="card-title mb-1">
+                            <i class="fa fa-sitemap mr-2 text-primary"></i>Registros Sisipedia
+                        </h4>
+                        <small class="text-muted">Estructura jerárquica de registros y sub-registros</small>
+                    </div>
                     <a href="{{ route('sisipedia.categories.create') }}" class="btn btn-primary btn-sm">
-                        <i class="fa fa-plus me-1"></i> Nueva Categoría
+                        <i class="fa fa-plus mr-1"></i>Nuevo registro
                     </a>
                 </div>
             </div>
+        </div>
 
+        <div class="card border-0 shadow-sm">
             <div class="card-body">
                 <!-- Buscador + controles -->
                 <div class="mb-4">

@@ -88,8 +88,8 @@
                 target="_blank" class="btn btn-sm btn-info btn-icon" title="Ver detalles">
                 <i class="fa fa-eye"></i>
             </a>
-            <a href="{{ route('sisipedia.categories.edit', $category) }}" class="btn btn-sm btn-warning btn-icon"
-                title="Editar">
+            <a href="{{ route('sisipedia.categories.edit', $category) }}" class="btn btn-sm btn-outline-primary btn-icon"
+                title="Editar registro">
                 <i class="fa fa-edit"></i>
             </a>
             <button type="button" class="btn btn-sm btn-primary btn-icon toggle-status-btn"
@@ -105,10 +105,11 @@
                     <i class="fa fa-trash"></i>
                 </button>
             @else
-                <button type="button" class="btn btn-sm btn-secondary btn-icon" disabled
-                    title="No se puede eliminar porque tiene subcategorías">
-                    <i class="fa fa-trash"></i>
-                </button>
+                <span class="btn btn-sm btn-light border text-muted btn-icon" style="cursor:not-allowed;opacity:.85;"
+                    title="Eliminar no disponible: primero borra o mueve las subcategorías"
+                    role="button" tabindex="0" aria-disabled="true">
+                    <i class="fa fa-ban mr-1"></i><span class="d-none d-xl-inline small">No eliminar</span>
+                </span>
             @endif
         </div>
     </div>

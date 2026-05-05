@@ -41,14 +41,15 @@
                                target="_blank" class="btn btn-sm p-0 ms-1 text-{{ $color }}" title="Ver">
                                 <i class="fa fa-external-link-alt" style="font-size:.75rem;"></i>
                             </a>
-                            <form action="{{ route('sisipedia.categories.files.destroy', [$category, $file]) }}"
-                                  method="POST" class="d-inline ms-1"
-                                  onsubmit="return confirm('¿Eliminar este archivo?')">
-                                @csrf @method('DELETE')
-                                <button type="submit" class="btn btn-sm p-0 text-danger" title="Eliminar">
-                                    <i class="fa fa-times" style="font-size:.75rem;"></i>
-                                </button>
-                            </form>
+                            {{-- No usar <form> anidado dentro del formulario de edición de categoría: el navegador
+                                 cierra el formulario padre y el botón "Actualizar" deja de enviar. --}}
+                            <button type="button"
+                                class="btn btn-sm p-0 text-danger ml-1 sisipedia-delete-file-btn"
+                                title="Eliminar"
+                                data-delete-url="{{ route('sisipedia.categories.files.destroy', [$category, $file]) }}"
+                                data-csrf="{{ csrf_token() }}">
+                                <i class="fa fa-times" style="font-size:.75rem;"></i>
+                            </button>
                         </div>
                     @endforeach
                 </div>
@@ -109,3 +110,32 @@
 
     </div>
 </div>
+
+@if($existingFiles->isNotEmpty())
+<script>
+(function () {
+    document.querySelectorAll('.sisipedia-delete-file-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            if (!confirm('¿Eliminar este archivo?')) {
+                return;
+            }
+            var form = document.createElement('form');
+            form.method = 'POST';
+            form.action = btn.getAttribute('data-delete-url');
+            var csrf = document.createElement('input');
+            csrf.type = 'hidden';
+            csrf.name = '_token';
+            csrf.value = btn.getAttribute('data-csrf');
+            var method = document.createElement('input');
+            method.type = 'hidden';
+            method.name = '_method';
+            method.value = 'DELETE';
+            form.appendChild(csrf);
+            form.appendChild(method);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+})();
+</script>
+@endif

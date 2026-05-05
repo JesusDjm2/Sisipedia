@@ -29,14 +29,14 @@
                 <div class="contenedor">
                     <img src="{{ asset('img/min/formacion-continua-pukllasunchis-01.webp') }}" alt="" class="img-fluid">
                     <h2 class="position-absolute text-center text-white">Videos</h2>
-                    <a href="{{ route('videos') }}">Ver videos institucionales</a>
+                    <a href="{{ route('videos') }}">Ver registros</a>
                 </div>
             </div>
             <div class="col">
                 <div class="contenedor">
-                    <img src="{{ asset('img/min/canciones-Pukllasunchis.webp') }}" alt="" class="img-fluid">
-                    <h2 class="position-absolute text-center text-white">Audio</h2>
-                    <a href="#home-audios-sisipedia">Audios en esta página</a>
+                    <img src="{{ asset('img/min/libros-Pukllasunchis-min.webp') }}" alt="" class="img-fluid">
+                    <h2 class="position-absolute text-center text-white px-2">Textos<br><small style="font-size: 12px;">(PDF / Word)</small></h2>
+                    <a href="{{ route('libros') }}">Ver registros</a>
                 </div>
             </div>
             <div class="col">

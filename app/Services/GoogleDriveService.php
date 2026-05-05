@@ -11,10 +11,11 @@ use Illuminate\Http\UploadedFile;
 class GoogleDriveService
 {
     private Drive $service;
+
     private Client $client;
 
     private array $folderIds = [
-        'pdf'   => null,
+        'pdf' => null,
         'audio' => null,
         'video' => null,
     ];
@@ -28,8 +29,8 @@ class GoogleDriveService
         $this->service = new Drive($this->client);
 
         $this->folderIds = [
-            'pdf'   => env('GOOGLE_DRIVE_FOLDER_PDF'),
-            'doc'   => env('GOOGLE_DRIVE_FOLDER_PDF'),  // docs van a la misma carpeta que pdf
+            'pdf' => env('GOOGLE_DRIVE_FOLDER_PDF'),
+            'doc' => env('GOOGLE_DRIVE_FOLDER_PDF'),  // docs van a la misma carpeta que pdf
             'audio' => env('GOOGLE_DRIVE_FOLDER_AUDIO'),
             'video' => env('GOOGLE_DRIVE_FOLDER_VIDEO'),
         ];
@@ -48,7 +49,7 @@ class GoogleDriveService
         $mimeType = $file->getMimeType() ?? 'application/octet-stream';
 
         $meta = new DriveFile([
-            'name'    => $fileName,
+            'name' => $fileName,
             'parents' => $folderId ? [$folderId] : [],
         ]);
 
@@ -56,7 +57,7 @@ class GoogleDriveService
         $this->client->setDefer(true);
 
         $request = $this->service->files->create($meta, [
-            'fields'            => 'id',
+            'fields' => 'id',
             'supportsAllDrives' => true,
         ]);
 
@@ -72,11 +73,11 @@ class GoogleDriveService
         $media->setFileSize($file->getSize());
 
         // Enviar chunks
-        $handle   = fopen($file->getRealPath(), 'rb');
+        $handle = fopen($file->getRealPath(), 'rb');
         $uploaded = false;
 
         while (! $uploaded && ! feof($handle)) {
-            $chunk    = fread($handle, self::CHUNK_SIZE);
+            $chunk = fread($handle, self::CHUNK_SIZE);
             $uploaded = $media->nextChunk($chunk);
         }
 

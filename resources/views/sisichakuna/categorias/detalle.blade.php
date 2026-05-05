@@ -1,7 +1,8 @@
 @extends('layouts.app')
 @section('titulo', 'Detalle de registro')
 @section('contenido')
-    <div class="container-fluid py-4">
+    @include('sisichakuna.partials.sisipedia-admin-nav', ['active' => 'categories'])
+    <div class="container-fluid py-4 px-0">
         <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
             <div>
                 <h3 class="mb-1">
@@ -27,8 +28,8 @@
             </div>
 
             <div class="d-flex gap-2">
-                <a href="{{ route('sisipedia.categories.edit', $category) }}" class="btn btn-warning btn-sm">
-                    <i class="fa fa-edit me-1"></i>Editar
+                <a href="{{ route('sisipedia.categories.edit', $category) }}" class="btn btn-primary btn-sm">
+                    <i class="fa fa-edit mr-1"></i>Editar
                 </a>
                 <a href="{{ route('sisipedia.categories.show', $category) }}" class="btn btn-info btn-sm" target="_blank">
                     <i class="fa fa-external-link-alt me-1"></i>Ver público

@@ -9,11 +9,6 @@
             <a href="{{ route('sisipedia.categories.index') }}">
                 <img src="{{ asset('img/Sisichakuna.webp') }}" width="100%" loading="lazy">
             </a>
-        </div>     
-        {{-- <div class="col-lg-3 p-3">
-            <a href="{{route('admin.index')}}">
-                <img src="{{ asset('img/usuarios.webp') }}" width="100%" loading="lazy">
-            </a> --}}
-        </div> 
+        </div>   
     </div>
 @endsection

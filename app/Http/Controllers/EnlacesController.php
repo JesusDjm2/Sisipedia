@@ -114,13 +114,21 @@ class EnlacesController extends Controller
             ->take(12)
             ->get();
 
+        $ultimosAportes = Aportacion::query()
+            ->where('is_approved', true)
+            ->with(['category.parent.parent'])
+            ->latest()
+            ->take(4)
+            ->get();
+
         return view('welcome', compact(
             'libros',
             'videos',
             'sisipediaVideoFiles',
             'sisipediaVideoAportaciones',
             'sisipediaAudioFiles',
-            'sisipediaAudioAportaciones'
+            'sisipediaAudioAportaciones',
+            'ultimosAportes'
         ));
     }
 

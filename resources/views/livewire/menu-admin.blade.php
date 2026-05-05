@@ -68,9 +68,29 @@
                     </ul>
                 </li>
             @endrole
-            {{-- @role('sisicha')
-                Sisichas!
-            @endrole --}}
+            @role('sisicha')
+                <li>
+                    <a href="#sisipediaSisichaSubmenu" data-toggle="collapse" aria-expanded="false"
+                        class="dropdown-toggle"><i class="fa fa-layer-group"></i> Sisipedia</a>
+                    <ul class="collapse list-unstyled" id="sisipediaSisichaSubmenu">
+                        <li>
+                            <a href="{{ route('home') }}"><span class="flecha-admin">→</span> Panel (inicio)</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('sisipedia.categories.index') }}"><span class="flecha-admin">→</span>
+                                Registros (categorías)</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('sisipedia.aportaciones.index') }}"><span class="flecha-admin">→</span>
+                                Aportaciones</a>
+                        </li>
+                        <li>
+                            <a href="{{ route('public.categoria.sisi') }}" target="_blank"
+                                rel="noopener"><span class="flecha-admin">→</span> Catálogo público</a>
+                        </li>
+                    </ul>
+                </li>
+            @endrole
             @role('biblioteca')
                 <li class="active">
                     <a href="#homeSubmenu" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle"><i
