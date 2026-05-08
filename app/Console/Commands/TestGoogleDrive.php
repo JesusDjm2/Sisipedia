@@ -116,13 +116,16 @@ class TestGoogleDrive extends Command
     private function checkFolders(): void
     {
         $this->line('');
-        $this->comment('[ 3 ] Verificar carpetas en .env');
+        $this->comment('[ 3 ] Verificar carpetas en config/google-drive (.env compilado con config:cache)');
 
+        $f = config('google-drive.folders', []);
         $this->folderIds = [
-            'sisipedia' => env('GOOGLE_DRIVE_FOLDER_SISIPEDIA'),
-            'pdf'       => env('GOOGLE_DRIVE_FOLDER_PDF'),
-            'audio'     => env('GOOGLE_DRIVE_FOLDER_AUDIO'),
-            'video'     => env('GOOGLE_DRIVE_FOLDER_VIDEO'),
+            'sisipedia' => config('google-drive.folder_sisipedia'),
+            'pdf'       => $f['pdf'] ?? null,
+            'doc'       => $f['doc'] ?? null,
+            'imagen'    => $f['imagen'] ?? null,
+            'audio'     => $f['audio'] ?? null,
+            'video'     => $f['video'] ?? null,
         ];
 
         foreach ($this->folderIds as $name => $id) {

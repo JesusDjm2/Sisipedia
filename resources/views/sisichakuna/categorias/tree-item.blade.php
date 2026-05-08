@@ -9,7 +9,7 @@
                 <div style="width: 28px;"></div>
             @endif
             @if ($category->image)
-                <img src="{{ asset($category->image) }}" alt="{{ $category->name }}" class="category-image">
+                <img src="{{ asset($category->image) }}" alt="{{ $category->display_name }}" class="category-image">
             @else
                 <div class="category-image-placeholder">
                     <i class="fa fa-folder"></i>
@@ -18,7 +18,7 @@
             <div class="category-details">
                 <div class="category-name">
                     <span class="text-primary fw-bold mr-2">{{ $category->numbering }}</span>
-                    <span class="cat-name-text">{{ $category->name }}</span>
+                    <span class="cat-name-text">{{ $category->display_name }}</span>
                 </div>
                 @if ($category->slug)
                     <div class="category-slug">{{ $category->slug }}</div>
@@ -69,7 +69,7 @@
                 @if ($category->parent)
                     <span class="category-parent">
                         <i class="fa fa-level-up-alt fa-rotate-90"></i>
-                        {{ $category->parent->name }}
+                        {{ $category->parent->display_name }}
                     </span>
                 @endif
 
@@ -98,19 +98,17 @@
                 title="{{ $category->is_active ? 'Desactivar' : 'Activar' }}">
                 <i class="fa fa-{{ $category->is_active ? 'ban' : 'check' }}"></i>
             </button>
-            @if (!$category->children->count())
-                <button type="button" class="btn btn-sm btn-danger btn-icon delete-category"
-                    data-id="{{ $category->id }}" data-name="{{ $category->name }}"
-                    data-delete-url="{{ route('sisipedia.categories.destroy', $category) }}" title="Eliminar">
-                    <i class="fa fa-trash"></i>
-                </button>
-            @else
-                <span class="btn btn-sm btn-light border text-muted btn-icon" style="cursor:not-allowed;opacity:.85;"
-                    title="Eliminar no disponible: primero borra o mueve las subcategorías"
-                    role="button" tabindex="0" aria-disabled="true">
-                    <i class="fa fa-ban mr-1"></i><span class="d-none d-xl-inline small">No eliminar</span>
-                </span>
-            @endif
+            @php $subtreeSize = $category->subtreeSize(); @endphp
+            <button type="button"
+                class="btn btn-sm btn-icon delete-category {{ $category->children->count() ? 'btn-outline-danger' : 'btn-danger' }}"
+                data-id="{{ $category->id }}" data-name="{{ $category->display_name }}"
+                data-delete-url="{{ route('sisipedia.categories.destroy', $category) }}"
+                data-cascade="{{ $category->children->count() ? '1' : '0' }}" data-subtree-size="{{ $subtreeSize }}"
+                title="{{ $category->children->count() ? 'Eliminar este registro y toda su jerarquía (herencias)' : 'Eliminar' }}">
+                <i class="fa fa-trash"></i>@if ($category->children->count())
+                    <span class="d-none d-xl-inline small ml-1">+ jerarquía</span>
+                @endif
+            </button>
         </div>
     </div>
 

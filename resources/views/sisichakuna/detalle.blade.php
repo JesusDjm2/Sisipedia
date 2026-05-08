@@ -5,7 +5,7 @@
         <div class="overlay"></div>
         <div class="centered-content">
             <h2>SISIPEDIA</h2>
-            <h1>{{ $category->name ?? 'Detalle del registro' }}</h1>
+            <h1>{{ $category->display_name ?? 'Detalle del registro' }}</h1>
         </div>
     </div>
     <div class="container">
@@ -20,11 +20,11 @@
                         </li>
                         @foreach ($breadcrumbs as $item)
                             @if ($loop->last)
-                                <li class="breadcrumb-item active" aria-current="page">{{ $item->name }}</li>
+                                <li class="breadcrumb-item active" aria-current="page">{{ $item->display_name }}</li>
                             @else
                                 <li class="breadcrumb-item">
                                     <a href="{{ route('sisipedia.categories.show', $item) }}"
-                                        class="text-decoration-none">{{ $item->name }}</a>
+                                        class="text-decoration-none">{{ $item->display_name }}</a>
                                 </li>
                             @endif
                         @endforeach
@@ -40,7 +40,7 @@
 
                             {{-- Imagen --}}
                             @if ($category->image)
-                                <img src="{{ asset($category->image) }}" alt="{{ $category->name }}"
+                                <img src="{{ asset($category->image) }}" alt="{{ $category->display_name }}"
                                     class="img-fluid w-100" style="max-height: 340px; object-fit: cover;">
                             @else
                                 <div class="d-flex align-items-center justify-content-center bg-light"
@@ -55,11 +55,11 @@
                                     <p class="text-muted small mb-2">
                                         <i class="fa fa-level-up-alt me-1 fa-rotate-90"></i>Pertenece a:
                                         <a href="{{ route('sisipedia.categories.show', $category->parent) }}"
-                                           class="text-decoration-none fw-semibold">{{ $category->parent->name }}</a>
+                                           class="text-decoration-none fw-semibold">{{ $category->parent->display_name }}</a>
                                     </p>
                                 @endif
 
-                                <h1 class="h3 fw-bold mb-2">{{ $category->name }}</h1>
+                                <h1 class="h3 fw-bold mb-2">{{ $category->display_name }}</h1>
                                 <p class="text-muted mb-0">
                                     {{ $category->description ?: 'Este registro no tiene descripción adicional.' }}
                                 </p>
@@ -215,7 +215,7 @@
                                                 <div class="d-flex gap-2 align-items-start p-2">
                                                     {{-- Imagen o ícono --}}
                                                     @if ($child->image)
-                                                        <img src="{{ asset($child->image) }}" alt="{{ $child->name }}"
+                                                        <img src="{{ asset($child->image) }}" alt="{{ $child->display_name }}"
                                                             class="rounded flex-shrink-0 mt-1" width="40" height="40"
                                                             style="object-fit: cover;">
                                                     @else
@@ -227,7 +227,7 @@
 
                                                     <div class="overflow-hidden flex-grow-1">
                                                         <div class="fw-semibold text-dark text-truncate" style="font-size:.9rem;">
-                                                            {{ $child->name }}
+                                                            {{ $child->display_name }}
                                                         </div>
                                                         @if ($child->description)
                                                             <small class="text-muted d-block text-truncate" style="font-size:.75rem;">
@@ -429,12 +429,32 @@
                                             <input type="text" name="ubicacion" class="form-control @error('ubicacion') is-invalid @enderror"
                                                    value="{{ old('ubicacion') }}">
                                         </div>
-                                        <div class="col-12">
-                                            <label class="form-label fw-semibold">Detalle</label>
-                                            <textarea name="detalle" rows="3"
-                                                      class="form-control @error('detalle') is-invalid @enderror">{{ old('detalle') }}</textarea>
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Título:</label>
+                                            <input type="text" name="titulo" class="form-control @error('titulo') is-invalid @enderror"
+                                                   value="{{ old('titulo') }}">
+                                            @error('titulo')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label fw-semibold">Lugar de trabajo:</label>
+                                            <input type="text" name="lugar_trabajo" class="form-control @error('lugar_trabajo') is-invalid @enderror"
+                                                   value="{{ old('lugar_trabajo') }}">
+                                            @error('lugar_trabajo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label fw-semibold">Detalle:</label>
+                                            <textarea name="detalle" rows="3"
+                                                      class="form-control summernote-editor @error('detalle') is-invalid @enderror">{{ old('detalle') }}</textarea>
+                                        </div>
+                                        <div class="col">
+                                            <label class="form-label fw-semibold">
+                                                <i class="fa fa-image text-info me-1"></i>Imagen
+                                            </label>
+                                            <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp,.gif"
+                                                   class="form-control @error('imagen') is-invalid @enderror">
+                                            @error('imagen')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                                        </div>
+                                        <div class="col">
                                             <label class="form-label fw-semibold">
                                                 <i class="fa fa-file-pdf text-danger me-1"></i>PDF
                                             </label>
@@ -442,15 +462,15 @@
                                                    class="form-control @error('pdf') is-invalid @enderror">
                                             @error('pdf')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col">
                                             <label class="form-label fw-semibold">
-                                                <i class="fa fa-file-word text-primary me-1"></i>Documento Word (.doc/.docx)
+                                                <i class="fa fa-file-word text-primary me-1"></i>Word
                                             </label>
                                             <input type="file" name="doc" accept=".doc,.docx"
                                                    class="form-control @error('doc') is-invalid @enderror">
                                             @error('doc')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col">
                                             <label class="form-label fw-semibold">
                                                 <i class="fa fa-music text-success me-1"></i>Audio
                                             </label>
@@ -458,7 +478,7 @@
                                                    class="form-control @error('audio') is-invalid @enderror">
                                             @error('audio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                                         </div>
-                                        <div class="col-md-3">
+                                        <div class="col">
                                             <label class="form-label fw-semibold">
                                                 <i class="fa fa-video text-warning me-1"></i>Video
                                             </label>
@@ -512,9 +532,19 @@
                                                         @endif
                                                     </div>
                                                     <div class="d-flex flex-wrap gap-2 mb-2">
+                                                        @if($aportacion->titulo)
+                                                            <span class="badge bg-info bg-opacity-10 text-info border border-info">
+                                                                <i class="fa fa-heading me-1"></i>{{ $aportacion->titulo }}
+                                                            </span>
+                                                        @endif
                                                         @if($aportacion->institucion)
                                                             <span class="badge bg-light text-dark border">
                                                                 <i class="fa fa-building me-1"></i>{{ $aportacion->institucion }}
+                                                            </span>
+                                                        @endif
+                                                        @if($aportacion->lugar_trabajo)
+                                                            <span class="badge bg-light text-dark border">
+                                                                <i class="fa fa-briefcase me-1"></i>{{ $aportacion->lugar_trabajo }}
                                                             </span>
                                                         @endif
                                                         @if($aportacion->ubicacion)
@@ -524,12 +554,29 @@
                                                         @endif
                                                     </div>
                                                     @if($aportacion->detalle)
-                                                        <p class="text-muted small mb-2">{{ $aportacion->detalle }}</p>
+                                                        <p class="text-muted small mb-2">{!! $aportacion->detalle !!}</p>
+                                                    @endif
+
+                                                    @if($aportacion->imagen)
+                                                        <div class="mb-2">
+                                                            <a href="{{ \App\Services\GoogleDriveService::getUrl($aportacion->imagen) }}" target="_blank" rel="noopener">
+                                                                <img src="{{ \App\Services\GoogleDriveService::getThumbnailUrl($aportacion->imagen, 400) }}"
+                                                                     alt="Imagen de {{ $aportacion->nombre_ol }}"
+                                                                     class="img-fluid rounded border"
+                                                                     style="max-height:260px;">
+                                                            </a>
+                                                        </div>
                                                     @endif
 
                                                     {{-- Archivos de la aportación --}}
-                                                    @if($aportacion->pdf || $aportacion->doc || $aportacion->audio || $aportacion->video)
+                                                    @if($aportacion->pdf || $aportacion->doc || $aportacion->audio || $aportacion->video || $aportacion->imagen)
                                                         <div class="d-flex flex-wrap gap-2">
+                                                            @if($aportacion->imagen)
+                                                                <a href="{{ \App\Services\GoogleDriveService::getUrl($aportacion->imagen) }}"
+                                                                   target="_blank" class="btn btn-sm btn-outline-info">
+                                                                    <i class="fa fa-image me-1"></i>Imagen
+                                                                </a>
+                                                            @endif
                                                             @if($aportacion->pdf)
                                                                 <a href="{{ \App\Services\GoogleDriveService::getUrl($aportacion->pdf) }}"
                                                                    target="_blank" class="btn btn-sm btn-outline-danger">
@@ -651,6 +698,42 @@
                             seleccionarRol('{{ old('rol_nombre') }}');
                         });
                     @endif
+
+                    // Función para inicializar Summernote
+                    function initSummernote() {
+                        if (window.jQuery && $('.summernote-editor').length && !$('.summernote-editor').hasClass('summernote-initialized')) {
+                            $('.summernote-editor').summernote({
+                                height: 120,
+                                toolbar: [
+                                    ['style', ['style']],
+                                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                                    ['para', ['ul', 'ol', 'paragraph']],
+                                    ['insert', ['link']],
+                                    ['view', ['fullscreen', 'codeview']]
+                                ],
+                                placeholder: 'Describe los detalles de esta aportación...',
+                                callbacks: {
+                                    onInit: function() {
+                                        $('.note-editable').css('font-size', '14px');
+                                        $('.summernote-editor').addClass('summernote-initialized');
+                                    }
+                                }
+                            });
+                        }
+                    }
+
+                    // Inicializar Summernote cuando se muestra el formulario
+                    document.addEventListener('DOMContentLoaded', function() {
+                        // Intentar inicializar por si el formulario ya está visible
+                        initSummernote();
+                        
+                        // También inicializar cuando se selecciona un rol
+                        const originalSeleccionarRol = window.seleccionarRol;
+                        window.seleccionarRol = function(rol) {
+                            originalSeleccionarRol(rol);
+                            setTimeout(initSummernote, 100);
+                        };
+                    });
 
                     /** Vista previa de archivos de categoría: iframe solo tras pulsar el botón */
                     document.addEventListener('click', function (e) {

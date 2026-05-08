@@ -44,8 +44,9 @@
                                     @foreach ($parents as $parent)
                                         <option value="{{ $parent->id }}"
                                             data-depth="{{ $parent->depth }}"
+                                            data-numbering="{{ $parent->numbering }}"
                                             {{ old('parent_id') == $parent->id ? 'selected' : '' }}>
-                                            {{ str_repeat('— ', $parent->depth) }}{{ $parent->name }}
+                                            {{ str_repeat('— ', $parent->depth) }}{{ $parent->display_name }}
                                         </option>
                                     @endforeach
                                 </select>

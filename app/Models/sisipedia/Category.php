@@ -4,7 +4,7 @@ namespace App\Models\sisipedia;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Str;
+use Illuminate\Support\Str;
 
 class Category extends Model
 {
@@ -31,7 +31,7 @@ class Category extends Model
 
         static::creating(function ($category) {
             if (empty($category->slug)) {
-                $category->slug = Str::slug($category->name);
+                $category->slug = Str::slug(self::stripLegacyOntologyPrefix($category->name));
             }
         });
     }
@@ -79,13 +79,63 @@ class Category extends Model
         return $this->children()->count() > 0;
     }
 
+    /** Cantidad de nodos en este subárbol (esta categoría + todas sus descendencias). */
+    public function subtreeSize(): int
+    {
+        $count = 0;
+        $frontier = [$this->id];
+        while (! empty($frontier)) {
+            $count += count($frontier);
+            $frontier = self::whereIn('parent_id', $frontier)->pluck('id')->all();
+        }
+
+        return $count;
+    }
+
+    /**
+     * IDs de esta categoría y descendientes, orden hoja → raíz (sirve para borrar sin violar FKs).
+     *
+     * @return array<int>
+     */
+    public function subtreeIdsPostOrder(): array
+    {
+        $out = [];
+        $childIds = self::where('parent_id', $this->id)->orderBy('order')->pluck('id');
+        foreach ($childIds as $cid) {
+            $child = self::find($cid);
+            if ($child) {
+                $out = array_merge($out, $child->subtreeIdsPostOrder());
+            }
+        }
+        $out[] = $this->id;
+
+        return $out;
+    }
+
+    /**
+     * Quita prefijos ontológicos heredados (p. ej. "1 ", "2.3.1 - ", "10.") del nombre guardado en BD.
+     */
+    public static function stripLegacyOntologyPrefix(string $name): string
+    {
+        $trimmed = trim($name);
+        $cleaned = preg_replace('/^\s*\d+(?:\.\d+)*\s*[-–.:\)]?\s*/u', '', $trimmed);
+
+        return $cleaned !== '' ? $cleaned : $trimmed;
+    }
+
+    /** Nombre sin prefijo numérico ontológico (solo para pantallas; el campo `name` en BD puede seguir igual). */
+    public function getDisplayNameAttribute(): string
+    {
+        return self::stripLegacyOntologyPrefix($this->attributes['name'] ?? '');
+    }
+
     public function getPathAttribute()
     {
         $path = collect();
 
         $category = $this;
         while ($category) {
-            $path->prepend($category->name);
+            $path->prepend($category->display_name);
             $category = $category->parent;
         }
 
@@ -107,11 +157,9 @@ class Category extends Model
         $numbers = [];
         $current = $this;
         while ($current) {
-            // Obtener el orden de esta categoría entre sus hermanos
             $siblings = Category::where('parent_id', $current->parent_id)
                 ->orderBy('order')
                 ->get();
-            // Encontrar la posición (índice comenzando en 1)
             $position = 1;
             foreach ($siblings as $index => $sibling) {
                 if ($sibling->id === $current->id) {

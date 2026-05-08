@@ -15,11 +15,11 @@
                         </li>
                         @foreach ($breadcrumbs as $item)
                             @if ($loop->last)
-                                <li class="breadcrumb-item active" aria-current="page">{{ $item->name }}</li>
+                                <li class="breadcrumb-item active" aria-current="page">{{ $item->display_name }}</li>
                             @else
                                 <li class="breadcrumb-item">
                                     <a href="{{ route('sisipedia.categories.admin-show', $item) }}"
-                                        class="text-decoration-none">{{ $item->name }}</a>
+                                        class="text-decoration-none">{{ $item->display_name }}</a>
                                 </li>
                             @endif
                         @endforeach
@@ -44,7 +44,7 @@
                         <div class="d-flex flex-column flex-md-row gap-3">
                             <div class="flex-shrink-0">
                                 @if ($category->image)
-                                    <img src="{{ asset($category->image) }}" alt="{{ $category->name }}"
+                                    <img src="{{ asset($category->image) }}" alt="{{ $category->display_name }}"
                                         class="rounded border" width="120" height="120" style="object-fit: cover;">
                                 @else
                                     <div class="rounded border bg-light d-flex align-items-center justify-content-center"
@@ -62,12 +62,12 @@
                                     </span>
                                     @if ($category->parent)
                                         <span class="badge bg-light text-dark border">
-                                            Padre: {{ $category->parent->name }}
+                                            Padre: {{ $category->parent->display_name }}
                                         </span>
                                     @endif
                                 </div>
 
-                                <h4 class="mb-1">{{ $category->name }}</h4>
+                                <h4 class="mb-1">{{ $category->display_name }}</h4>
                                 <div class="text-muted small mb-2">
                                     <i class="fa fa-tag me-1"></i>{{ $category->slug ?: 'sin-slug' }}
                                     <span class="mx-2">•</span>
@@ -151,7 +151,7 @@
                                         class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                                         <span class="text-truncate">
                                             <span class="badge bg-light text-dark border me-2">{{ $child->numbering }}</span>
-                                            {{ $child->name }}
+                                            {{ $child->display_name }}
                                         </span>
                                         <span class="badge {{ $child->is_active ? 'bg-success' : 'bg-secondary' }}">
                                             {{ $child->is_active ? 'Activo' : 'Inactivo' }}

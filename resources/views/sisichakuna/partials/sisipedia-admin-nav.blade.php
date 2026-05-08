@@ -10,10 +10,6 @@
         <div class="d-flex flex-wrap align-items-center justify-content-between" style="gap:.75rem;">
             <div class="d-flex flex-wrap align-items-center" style="gap:.35rem;">
                 <span class="text-muted small text-uppercase font-weight-bold mr-2 d-none d-sm-inline">Sisipedia</span>
-                <a href="{{ route('home') }}"
-                    class="btn btn-sm {{ $active === 'home' ? 'btn-primary' : 'btn-outline-secondary' }}">
-                    <i class="fa fa-th-large mr-1"></i>Panel
-                </a>
                 <a href="{{ route('sisipedia.categories.index') }}"
                     class="btn btn-sm {{ $active === 'categories' ? 'btn-primary' : 'btn-outline-secondary' }}">
                     <i class="fa fa-sitemap mr-1"></i>Registros

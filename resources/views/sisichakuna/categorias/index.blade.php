@@ -288,7 +288,7 @@
                 });
             }
 
-            function submitPostForm(action, method = null) {
+            function submitPostForm(action, method = null, extraFields = null) {
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = action;
@@ -305,6 +305,16 @@
                     methodInput.name = '_method';
                     methodInput.value = method;
                     form.appendChild(methodInput);
+                }
+
+                if (extraFields && typeof extraFields === 'object') {
+                    Object.entries(extraFields).forEach(([name, value]) => {
+                        const hidden = document.createElement('input');
+                        hidden.type = 'hidden';
+                        hidden.name = name;
+                        hidden.value = value;
+                        form.appendChild(hidden);
+                    });
                 }
 
                 document.body.appendChild(form);
@@ -428,19 +438,34 @@
                     e.preventDefault();
                     const categoryName = this.dataset.name;
                     const deleteUrl = this.dataset.deleteUrl;
+                    const cascade = this.dataset.cascade === '1';
+                    const subtreeSize = parseInt(this.dataset.subtreeSize || '1', 10) || 1;
 
-                    Swal.fire({
-                        title: 'Eliminar registro',
-                        text: `¿Estás seguro de eliminar "${categoryName}"? Esta acción no se puede deshacer.`,
+                    const simpleText =
+                        `¿Eliminar «${categoryName}»? Esta acción no se puede deshacer.`;
+                    const cascadeHtml =
+                        `<p class="mb-2">Vas a eliminar <strong>«${categoryName}»</strong> y <strong>toda su ontología</strong> (sub-registros, nietos, etc.).</p>` +
+                        `<p class="mb-0"><strong>${subtreeSize}</strong> registro(s) en total, con sus archivos en Drive y aportaciones vinculadas. <span class="text-danger">No se puede deshacer.</span></p>`;
+
+                    const swalOpts = {
+                        title: cascade ? 'Eliminar jerarquía completa' : 'Eliminar registro',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Sí, eliminar',
+                        confirmButtonText: cascade ? 'Sí, eliminar todo' : 'Sí, eliminar',
                         cancelButtonText: 'Cancelar',
                         confirmButtonColor: '#d33',
                         reverseButtons: true
-                    }).then((result) => {
+                    };
+                    if (cascade) {
+                        swalOpts.html = cascadeHtml;
+                    } else {
+                        swalOpts.text = simpleText;
+                    }
+
+                    Swal.fire(swalOpts).then((result) => {
                         if (result.isConfirmed) {
-                            submitPostForm(deleteUrl, 'DELETE');
+                            const extra = cascade ? { cascade_subtree: '1' } : null;
+                            submitPostForm(deleteUrl, 'DELETE', extra);
                         }
                     });
                 });

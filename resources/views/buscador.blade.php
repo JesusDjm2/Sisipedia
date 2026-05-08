@@ -90,7 +90,7 @@
                         $path = [];
                         $cur = $reg;
                         while ($cur) {
-                            array_unshift($path, $cur->name);
+                            array_unshift($path, $cur->display_name);
                             $cur = $cur->parent ?? null;
                         }
                     @endphp
@@ -110,17 +110,33 @@
                                     <div class="min-w-0 flex-grow-1">
                                         <h6 class="mb-1 text-dark fw-semibold text-break">
                                             <a href="{{ route('sisipedia.categories.show', $reg) }}" class="text-decoration-none text-dark">
-                                                {!! $hl($reg->name, $query) !!}
+                                                {!! $hl($reg->display_name, $query) !!}
                                             </a>
                                         </h6>
                                         @if (count($path) > 1)
-                                            <small class="text-muted d-block buscador-card-breadcrumb">{{ implode(' › ', $path) }}</small>
+                                            @php
+                                                $parentPath = array_slice($path, 0, -1);
+                                            @endphp
+                                            <div class="d-flex align-items-center flex-wrap gap-1 mt-1">
+                                                <i class="fa fa-sitemap text-muted" style="font-size: .75rem;"></i>
+                                                @foreach($parentPath as $index => $parent)
+                                                    <span class="text-muted small" style="font-size: .75rem;">
+                                                        {{ $parent }}
+                                                    </span>
+                                                    @if($index < count($parentPath) - 1)
+                                                        <span> » </span>
+                                                    @endif
+                                                @endforeach
+                                            </div>
                                         @endif
                                     </div>
                                 </div>
 
                                 @if ($reg->description)
-                                    <p class="buscador-detalle mb-3">{!! $hl(Str::limit($reg->description, 360), $query) !!}</p>
+                                    @php
+                                        $cleanDescription = \App\Models\sisipedia\Category::stripLegacyOntologyPrefix($reg->description);
+                                    @endphp
+                                    <p class="buscador-detalle mb-3">{!! $hl(Str::limit($cleanDescription, 360), $query) !!}</p>
                                 @endif
 
                                 @php $regFiles = $reg->files ?? collect(); @endphp
@@ -281,7 +297,7 @@
                         $catPath = [];
                         $cur = $ap->category;
                         while ($cur) {
-                            array_unshift($catPath, $cur->name);
+                            array_unshift($catPath, $cur->display_name);
                             $cur = $cur->parent ?? null;
                         }
                     @endphp

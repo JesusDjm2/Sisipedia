@@ -18,6 +18,9 @@ return new class extends Migration
             $table->string('institucion')->nullable();
             $table->string('ubicacion')->nullable();
             $table->text('detalle')->nullable();
+            $table->string('titulo')->nullable()->after('nombre_ol');
+            $table->string('lugar_trabajo')->nullable()->after('institucion');
+            $table->string('imagen')->nullable()->after('detalle');
             $table->string('pdf')->nullable();
             $table->string('doc')->nullable();
             $table->string('audio')->nullable();

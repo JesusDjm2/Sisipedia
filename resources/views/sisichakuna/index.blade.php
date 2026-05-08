@@ -20,7 +20,7 @@
                 @foreach ($categories as $category)
                     <tr>
                         <td>{{ $category->id }}</td>
-                        <td>{{ $category->name }}</td>
+                        <td>{{ $category->display_name }}</td>
                         <td>{{ $category->path }}</td>
                         <td>
                             <span class="badge {{ $category->is_active ? 'bg-success' : 'bg-danger' }}">

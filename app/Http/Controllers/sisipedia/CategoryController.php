@@ -78,14 +78,14 @@ class CategoryController extends Controller
         $validated['is_active'] = $request->boolean('is_active');
 
         if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
+            $validated['slug'] = Str::slug(Category::stripLegacyOntologyPrefix($validated['name']));
         }
 
         if (empty($validated['order'])) {
             $validated['order'] = Category::where('parent_id', $validated['parent_id'] ?? null)->max('order') + 1;
         }
 
-        $slug = Str::slug($validated['name']);
+        $slug = Str::slug(Category::stripLegacyOntologyPrefix($validated['name']));
 
         if ($request->hasFile('image')) {
             $validated['image'] = $this->storeImage($request->file('image'), $slug);
@@ -196,7 +196,7 @@ class CategoryController extends Controller
         return response()->json([
             'categories' => $categories->map(fn ($c) => [
                 'id' => $c->id,
-                'name' => $c->name,
+                'name' => $c->display_name,
                 'description' => $c->description ? Str::limit($c->description, 110) : null,
                 'url' => route('sisipedia.categories.show', $c),
                 'breadcrumb' => $c->path,
@@ -217,7 +217,7 @@ class CategoryController extends Controller
                 'doc' => (bool) $a->doc,
                 'audio' => (bool) $a->audio,
                 'video' => (bool) $a->video,
-                'category_name' => $a->category?->name,
+                'category_name' => $a->category?->display_name,
                 'category_url' => $a->category ? route('sisipedia.categories.show', $a->category) : null,
                 'category_breadcrumb' => $a->category?->path,
             ]),
@@ -271,14 +271,14 @@ class CategoryController extends Controller
         }
 
         if (empty($validated['slug'])) {
-            $validated['slug'] = Str::slug($validated['name']);
+            $validated['slug'] = Str::slug(Category::stripLegacyOntologyPrefix($validated['name']));
         }
 
         if (empty($validated['order'])) {
             $validated['order'] = Category::where('parent_id', $validated['parent_id'] ?? null)->max('order') + 1;
         }
 
-        $slug = Str::slug($validated['name']);
+        $slug = Str::slug(Category::stripLegacyOntologyPrefix($validated['name']));
 
         // --- Imagen ---
         if ($request->has('remove_image') && $request->remove_image == 1) {
@@ -303,24 +303,63 @@ class CategoryController extends Controller
             ->with('success', 'Categoría actualizada exitosamente.');
     }
 
-    public function destroy(Category $category)
+    public function destroy(Request $request, Category $category)
     {
-        if ($category->children()->count() > 0) {
-            return back()->with('error', 'No se puede eliminar una categoría que tiene subcategorías.');
+        $cascadeSubtree = $request->boolean('cascade_subtree');
+
+        if ($category->children()->count() > 0 && ! $cascadeSubtree) {
+            return back()->with('error', 'No se puede eliminar una categoría que tiene subcategorías. Usa «Eliminar jerarquía» en el árbol o marca eliminación en cascada.');
         }
 
-        if ($category->image && file_exists(public_path($category->image))) {
-            unlink(public_path($category->image));
+        DB::transaction(function () use ($category, $cascadeSubtree): void {
+            if ($cascadeSubtree) {
+                foreach ($category->subtreeIdsPostOrder() as $categoryId) {
+                    $cat = Category::with(['aportaciones', 'files'])->find($categoryId);
+                    if ($cat) {
+                        $this->purgeCategoryStoredResources($cat);
+                        $cat->delete();
+                    }
+                }
+
+                return;
+            }
+
+            $this->purgeCategoryStoredResources($category);
+            $category->delete();
+        });
+
+        return redirect()->route('sisipedia.categories.index')
+            ->with(
+                'success',
+                $cascadeSubtree
+                    ? 'Registro y toda su jerarquía eliminados correctamente.'
+                    : 'Categoría eliminada exitosamente.'
+            );
+    }
+
+    /**
+     * Quita archivos locales, adjuntos en Drive y aportaciones de una categoría (sin borrar la fila aún).
+     */
+    private function purgeCategoryStoredResources(Category $category): void
+    {
+        foreach ($category->aportaciones as $aportacion) {
+            foreach (['imagen', 'pdf', 'doc', 'audio', 'video'] as $field) {
+                if ($aportacion->$field) {
+                    $this->drive->delete($aportacion->$field);
+                }
+            }
+            $aportacion->delete();
         }
 
         foreach ($category->files as $file) {
             $this->drive->delete($file->drive_id);
         }
 
-        $category->delete();
+        $category->files()->delete();
 
-        return redirect()->route('sisipedia.categories.index')
-            ->with('success', 'Categoría eliminada exitosamente.');
+        if ($category->image && file_exists(public_path($category->image))) {
+            unlink(public_path($category->image));
+        }
     }
 
     public function destroyFile(Category $category, CategoryFile $file)

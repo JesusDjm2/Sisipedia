@@ -46,7 +46,9 @@ class AportacionController extends Controller
             $q = $request->q;
             $query->where(function ($sub) use ($q) {
                 $sub->where('nombre_ol', 'like', "%{$q}%")
+                    ->orWhere('titulo', 'like', "%{$q}%")
                     ->orWhere('institucion', 'like', "%{$q}%")
+                    ->orWhere('lugar_trabajo', 'like', "%{$q}%")
                     ->orWhere('ubicacion', 'like', "%{$q}%");
             });
         }
@@ -89,7 +91,7 @@ class AportacionController extends Controller
             $current = $cat;
             $guard = 0;
             while ($current && $guard++ < 64) {
-                array_unshift($parts, $current->name);
+                array_unshift($parts, $current->display_name);
                 $pid = $current->parent_id;
                 $current = $pid ? $byId->get($pid) : null;
             }
@@ -105,10 +107,10 @@ class AportacionController extends Controller
                 $pathLabel = $pathFor($cat);
                 $rows[] = [
                     'id' => $cat->id,
-                    'name' => $cat->name,
+                    'name' => $cat->display_name,
                     'depth' => $depth,
                     'path_label' => $pathLabel,
-                    'search_blob' => mb_strtolower($pathLabel.' '.$cat->name),
+                    'search_blob' => mb_strtolower($pathLabel.' '.$cat->display_name),
                     'is_root' => $depth === 0,
                 ];
                 $walk((int) $cat->id, $depth + 1);
@@ -139,16 +141,19 @@ class AportacionController extends Controller
         $request->validate([
             'rol_nombre' => "required|in:{$rolesCat}",
             'nombre_ol' => 'required|string|max:255',
+            'titulo' => 'nullable|string|max:255',
             'institucion' => 'nullable|string|max:255',
+            'lugar_trabajo' => 'nullable|string|max:255',
             'ubicacion' => 'nullable|string|max:255',
             'detalle' => 'nullable|string',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
             'pdf' => 'nullable|file|mimes:pdf|max:20480',
             'doc' => ['nullable', File::types(['doc', 'docx'])->max(20480)],
             'audio' => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
             'video' => 'nullable|file|mimetypes:video/mp4,video/webm,video/quicktime,video/x-m4v,video/x-mp4,video/mpeg|max:204800',
         ]);
 
-        $data = $request->only(['rol_nombre', 'nombre_ol', 'institucion', 'ubicacion', 'detalle']);
+        $data = $request->only(['rol_nombre', 'nombre_ol', 'titulo', 'institucion', 'lugar_trabajo', 'ubicacion', 'detalle']);
         $data['category_id'] = $category->id;
         $data['is_approved'] = true;
 
@@ -182,9 +187,12 @@ class AportacionController extends Controller
         $validator = Validator::make($request->all(), [
             'rol_nombre' => "required|in:{$roles}",
             'nombre_ol' => 'required|string|max:255',
+            'titulo' => 'nullable|string|max:255',
             'institucion' => 'nullable|string|max:255',
+            'lugar_trabajo' => 'nullable|string|max:255',
             'ubicacion' => 'nullable|string|max:255',
             'detalle' => 'nullable|string',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
             'pdf' => 'nullable|file|mimes:pdf|max:20480',
             'doc' => ['nullable', File::types(['doc', 'docx'])->max(20480)],
             'audio' => 'nullable|file|mimes:mp3,wav,ogg,mpeg|max:51200',
@@ -198,9 +206,9 @@ class AportacionController extends Controller
                 ->withInput();
         }
 
-        $data = $request->only(['rol_nombre', 'nombre_ol', 'institucion', 'ubicacion', 'detalle']);
-        $data['category_id'] = null;
-        $data['is_approved'] = false;
+        $data = $request->only(['rol_nombre', 'nombre_ol', 'titulo', 'institucion', 'lugar_trabajo', 'ubicacion', 'detalle']);
+        $data['is_approved'] = true;
+        $data['category_id'] = $this->autoRelateCategory($request->nombre_ol ?? '');
 
         $prefix = 'general-'.Str::slug($request->nombre_ol).'-'.Str::random(4);
 
@@ -210,10 +218,7 @@ class AportacionController extends Controller
 
         return redirect()->route('index')
             ->withFragment('home-aporte-standalone')
-            ->with(
-                'aporte_success',
-                'Tu aporte se ha enviado. El equipo lo revisará y, si corresponde, lo aprobará desde el panel de administración.'
-            );
+            ->with('aporte_success', 'Tu aporte se ha publicado correctamente. ¡Gracias por contribuir!');
     }
 
     public function update(Request $request, Aportacion $aportacion)
@@ -223,11 +228,26 @@ class AportacionController extends Controller
         $validated = $request->validate([
             'nombre_ol'   => 'required|string|max:255',
             'rol_nombre'  => "required|in:{$roles}",
+            'titulo'      => 'nullable|string|max:255',
             'institucion' => 'nullable|string|max:255',
+            'lugar_trabajo' => 'nullable|string|max:255',
             'ubicacion'   => 'nullable|string|max:255',
             'detalle'     => 'nullable|string',
             'category_id' => 'nullable|exists:categories,id',
+            'imagen'      => 'nullable|image|mimes:jpg,jpeg,png,webp,gif|max:10240',
         ]);
+
+        if ($request->hasFile('imagen')) {
+            if ($aportacion->imagen) {
+                $this->drive->delete($aportacion->imagen);
+            }
+            $ext = $request->file('imagen')->getClientOriginalExtension();
+            $validated['imagen'] = $this->drive->upload(
+                $request->file('imagen'),
+                'imagen',
+                'aportacion-'.Str::slug($validated['nombre_ol']).'-'.Str::random(4).".{$ext}"
+            );
+        }
 
         $aportacion->update($validated);
 
@@ -256,6 +276,15 @@ class AportacionController extends Controller
     private function uploadArchivos(Request $request, string $prefix): array
     {
         $data = [];
+
+        if ($request->hasFile('imagen')) {
+            $ext = $request->file('imagen')->getClientOriginalExtension();
+            $data['imagen'] = $this->drive->upload(
+                $request->file('imagen'),
+                'imagen',
+                "{$prefix}-imagen.{$ext}"
+            );
+        }
 
         if ($request->hasFile('pdf')) {
             $ext = $request->file('pdf')->getClientOriginalExtension();
@@ -305,7 +334,7 @@ class AportacionController extends Controller
 
     private function eliminarAportacion(Aportacion $aportacion)
     {
-        foreach (['pdf', 'doc', 'audio', 'video'] as $field) {
+        foreach (['imagen', 'pdf', 'doc', 'audio', 'video'] as $field) {
             if ($aportacion->$field) {
                 $this->drive->delete($aportacion->$field);
             }
@@ -314,5 +343,41 @@ class AportacionController extends Controller
         $aportacion->delete();
 
         return back()->with('success', 'Aportación eliminada correctamente.');
+    }
+
+    /**
+     * Busca la categoría con mayor similitud al nombre_ol dado.
+     * Criterios (en orden):
+     *  1. similar_text() normalizado (sin acentos, minúsculas)
+     *  2. Boost a 85% si uno contiene al otro
+     * Umbral mínimo: 70%
+     */
+    private function autoRelateCategory(string $titulo): ?int
+    {
+        if (trim($titulo) === '') {
+            return null;
+        }
+
+        $normalTitulo = mb_strtolower(trim(Str::ascii($titulo)));
+        $bestId       = null;
+        $bestScore    = 0.0;
+
+        Category::where('is_active', true)->get(['id', 'name'])->each(function ($cat) use ($normalTitulo, &$bestId, &$bestScore) {
+            $normalName = mb_strtolower(trim(Str::ascii($cat->name)));
+
+            similar_text($normalTitulo, $normalName, $percent);
+
+            // Si uno contiene al otro completo, garantizamos al menos 85%
+            if (str_contains($normalName, $normalTitulo) || str_contains($normalTitulo, $normalName)) {
+                $percent = max($percent, 85.0);
+            }
+
+            if ($percent > $bestScore) {
+                $bestScore = $percent;
+                $bestId    = $cat->id;
+            }
+        });
+
+        return $bestScore >= 70.0 ? $bestId : null;
     }
 }

@@ -7,7 +7,7 @@
             <div class="col-md-10 mx-auto">
                 <div class="card border-0 shadow-sm">
                     <div class="card-header d-flex justify-content-between align-items-center">
-                        <h3 class="card-title mb-0">Editar registro: {{ $category->name }}</h3>
+                        <h3 class="card-title mb-0">Editar registro: {{ $category->display_name }}</h3>
                         <a href="{{ route('sisipedia.categories.index') }}" class="btn btn-outline-secondary btn-sm">
                             <i class="fa fa-arrow-left"></i> Volver al listado
                         </a>
@@ -20,7 +20,7 @@
                             <div class="form-group mb-3">
                                 <label for="name">Nombre <span class="text-danger">*</span></label>
                                 <input type="text" class="form-control @error('name') is-invalid @enderror"
-                                    id="name" name="name" value="{{ old('name', $category->name) }}" required>
+                                    id="name" name="name" value="{{ old('name', $category->display_name) }}" required>
                                 @error('name')
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
@@ -44,8 +44,9 @@
                                     @foreach ($parents as $parent)
                                         <option value="{{ $parent->id }}"
                                             data-depth="{{ $parent->depth }}"
+                                            data-numbering="{{ $parent->numbering }}"
                                             {{ old('parent_id', $category->parent_id) == $parent->id ? 'selected' : '' }}>
-                                            {{ str_repeat('— ', $parent->depth) }}{{ $parent->name }}
+                                            {{ str_repeat('— ', $parent->depth) }}{{ $parent->display_name }}
                                         </option>
                                     @endforeach
                                 </select>
@@ -89,7 +90,7 @@
                                 @if($category->image)
                                     <div class="mb-2">
                                         <img src="{{ asset($category->image) }}"
-                                             alt="{{ $category->name }}"
+                                             alt="{{ $category->display_name }}"
                                              style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                                         <div class="form-check mt-2">
                                             <input type="checkbox" class="form-check-input" id="remove_image" name="remove_image" value="1">
@@ -118,7 +119,7 @@
                                     id="order" name="order" value="{{ old('order', $category->order) }}"
                                     placeholder="Se asigna automáticamente si se deja vacío">
                                 <small class="form-text text-muted">
-                                    Define el orden dentro de la misma categoría padre. Números más bajos aparecerán primero. 
+                                    Define el orden dentro de la misma categoría padre. Números más bajos aparecerán primero.
                                     Cambiar el orden afectará la numeración.
                                 </small>
                                 @error('order')
@@ -184,35 +185,29 @@
                 }
             });
 
-            // Función para obtener el próximo número de orden
-            function getNextNumber(parentId, currentOrder = null) {
+            function getNextNumber(parentId) {
                 if (!parentId) {
-                    // Es categoría raíz - contar raíces existentes
                     const rootOptions = Array.from(parentSelect.options)
-                        .filter(opt => opt.value !== '' && !opt.getAttribute('data-numbering'));
+                        .filter(opt => opt.value !== '' && opt.getAttribute('data-depth') === '0');
                     return rootOptions.length + 1;
-                } else {
-                    // Es subcategoría - contar hijos del padre seleccionado
-                    const selectedOption = parentSelect.options[parentSelect.selectedIndex];
-                    const parentNumbering = selectedOption.getAttribute('data-numbering');
-                    
-                    const siblings = Array.from(parentSelect.options)
-                        .filter(opt => {
-                            const numbering = opt.getAttribute('data-numbering');
-                            return numbering && numbering.startsWith(parentNumbering + '.');
-                        });
-                    return siblings.length + 1;
                 }
+                const selectedOption = parentSelect.options[parentSelect.selectedIndex];
+                const parentNumbering = selectedOption.getAttribute('data-numbering');
+
+                const siblings = Array.from(parentSelect.options)
+                    .filter(opt => {
+                        const numbering = opt.getAttribute('data-numbering');
+                        return numbering && numbering.startsWith(parentNumbering + '.');
+                    });
+                return siblings.length + 1;
             }
 
-            // Calcular y mostrar la numeración prevista
             function calculatePreviewNumbering() {
                 const selectedOption = parentSelect.options[parentSelect.selectedIndex];
                 const parentNumbering = selectedOption.getAttribute('data-numbering');
                 const currentNumbering = '{{ $category->numbering }}';
-                
+
                 if (!parentSelect.value) {
-                    // Es categoría raíz
                     const nextNumber = getNextNumber(null);
                     const newNumbering = nextNumber.toString();
                     if (newNumbering !== currentNumbering) {
@@ -222,7 +217,6 @@
                         previewNumbering.style.display = 'none';
                     }
                 } else if (parentNumbering) {
-                    // Es subcategoría
                     const nextNumber = getNextNumber(parentSelect.value);
                     const newNumbering = parentNumbering + '.' + nextNumber;
                     if (newNumbering !== currentNumbering) {
@@ -237,8 +231,7 @@
             }
 
             parentSelect.addEventListener('change', calculatePreviewNumbering);
-            
-            // Calcular inicialmente si hay un valor seleccionado
+
             if (parentSelect.value) {
                 calculatePreviewNumbering();
             }

@@ -7,6 +7,7 @@ use Google\Http\MediaFileUpload;
 use Google\Service\Drive;
 use Google\Service\Drive\DriveFile;
 use Illuminate\Http\UploadedFile;
+use Psr\Http\Message\RequestInterface;
 
 class GoogleDriveService
 {
@@ -16,6 +17,7 @@ class GoogleDriveService
 
     private array $folderIds = [
         'pdf' => null,
+        'imagen' => null,
         'audio' => null,
         'video' => null,
     ];
@@ -28,11 +30,13 @@ class GoogleDriveService
 
         $this->service = new Drive($this->client);
 
+        $folders = config('google-drive.folders', []);
         $this->folderIds = [
-            'pdf' => env('GOOGLE_DRIVE_FOLDER_PDF'),
-            'doc' => env('GOOGLE_DRIVE_FOLDER_PDF'),  // docs van a la misma carpeta que pdf
-            'audio' => env('GOOGLE_DRIVE_FOLDER_AUDIO'),
-            'video' => env('GOOGLE_DRIVE_FOLDER_VIDEO'),
+            'pdf' => $folders['pdf'] ?? null,
+            'doc' => $folders['doc'] ?? ($folders['pdf'] ?? null),
+            'imagen' => $folders['imagen'] ?? null,
+            'audio' => $folders['audio'] ?? null,
+            'video' => $folders['video'] ?? null,
         ];
     }
 
@@ -46,6 +50,10 @@ class GoogleDriveService
     public function upload(UploadedFile $file, string $type, string $fileName): string
     {
         $folderId = $this->folderIds[$type] ?? null;
+        // Word usa la carpeta PDF; si en producción faltaba la clave «doc», caía sin parents → My Drive de la SA → 403 quota.
+        if (empty($folderId) && $type === 'doc') {
+            $folderId = $this->folderIds['pdf'] ?? null;
+        }
         $mimeType = $file->getMimeType() ?? 'application/octet-stream';
 
         $meta = new DriveFile([
@@ -56,6 +64,7 @@ class GoogleDriveService
         // Activar modo diferido para obtener la petición sin ejecutarla aún
         $this->client->setDefer(true);
 
+        /** @var RequestInterface $request Petición HTTP cuando el cliente está en modo defer (no un DriveFile). */
         $request = $this->service->files->create($meta, [
             'fields' => 'id',
             'supportsAllDrives' => true,
@@ -134,5 +143,10 @@ class GoogleDriveService
     public static function getPreviewUrl(string $fileId): string
     {
         return "https://drive.google.com/file/d/{$fileId}/preview";
+    }
+
+    public static function getThumbnailUrl(string $fileId, int $size = 120): string
+    {
+        return "https://drive.google.com/thumbnail?id={$fileId}&sz=w{$size}";
     }
 }

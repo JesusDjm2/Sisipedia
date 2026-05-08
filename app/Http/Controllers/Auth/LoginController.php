@@ -20,7 +20,7 @@ class LoginController extends Controller
         }
 
         if ($user->hasRole('sisicha')) {
-            return '/Admini-Sisichakunay';
+            return '/sisipedia/categories';
         }
 
         if ($user->hasRole('biblioteca')) {

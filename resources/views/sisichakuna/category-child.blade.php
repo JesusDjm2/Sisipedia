@@ -1,4 +1,4 @@
-<div class="category-item-public mb-2" data-name="{{ strtolower($category->name) }}">
+<div class="category-item-public mb-2" data-name="{{ strtolower($category->display_name) }}">
     <div class="accordion" id="accordion-child-{{ $category->id }}">
         <div class="accordion-item border-0">
             <div class="accordion-header">
@@ -12,7 +12,7 @@
                                 <!-- Icono pequeño para subcategorías -->
                                 <div class="flex-shrink-0">
                                     @if ($category->image)
-                                        <img src="{{ asset($category->image) }}" alt="{{ $category->name }}"
+                                        <img src="{{ asset($category->image) }}" alt="{{ $category->display_name }}"
                                             class="rounded-circle"
                                             style="width: 35px; height: 35px; object-fit: cover;">
                                     @else
@@ -27,7 +27,7 @@
                                 <div class="flex-grow-1 ms-3">
                                     <h6 class="mb-1">
                                         <span class="badge bg-secondary me-2">{{ $category->numbering }}</span>
-                                        {{ $category->name }}
+                                        {{ $category->display_name }}
                                     </h6>
                                     @if ($category->description)
                                         <p class="text-muted small mb-1">{{ Str::limit($category->description, 100) }}

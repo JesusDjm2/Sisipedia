@@ -103,7 +103,7 @@
                                             </span>
                                         </td>
                                         <td class="align-middle small text-muted">
-                                            {{ $ap->category->name ?? '—' }}
+                                            {{ $ap->category->display_name ?? '—' }}
                                         </td>
                                         <td class="align-middle small text-muted text-nowrap">
                                             {{ $ap->created_at->format('d/m/Y') }}

@@ -36,7 +36,7 @@
                         <div class="row">
                             <div class="col-12">
                                 @foreach ($tree as $category)
-                                    <div class="category-item-public mb-3" data-name="{{ strtolower($category->name) }}">
+                                    <div class="category-item-public mb-3" data-name="{{ strtolower($category->display_name) }}">
                                         <div class="accordion" id="accordion-{{ $category->id }}">
                                             <div class="accordion-item border-0 shadow-sm">
                                                 <div class="accordion-header">
@@ -53,7 +53,7 @@
                                                                     <div class="flex-shrink-0">
                                                                         @if ($category->image)
                                                                             <img src="{{ asset($category->image) }}"
-                                                                                alt="{{ $category->name }}"
+                                                                                alt="{{ $category->display_name }}"
                                                                                 class="rounded-circle"
                                                                                 style="width: 50px; height: 50px; object-fit: cover;">
                                                                         @else
@@ -70,7 +70,7 @@
                                                                         <h5 class="mb-1">
                                                                             <span
                                                                                 class="badge bg-primary me-2">{{ $category->numbering }}</span>
-                                                                            {{ $category->name }}
+                                                                            {{ $category->display_name }}
                                                                         </h5>
                                                                         @if ($category->description)
                                                                             <p class="text-muted mb-2">

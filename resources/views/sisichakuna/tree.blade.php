@@ -16,13 +16,13 @@
     {{-- ── Fila principal ───────────────────────────────────────── --}}
     <div class="list-group-item border rounded-3 px-3 py-2"
          data-category-item
-         data-searchable="{{ strtolower($category->name . ' ' . ($category->description ?? '')) }}">
+         data-searchable="{{ strtolower($category->display_name . ' ' . ($category->description ?? '')) }}">
 
         <div class="d-flex align-items-center gap-2">
 
             {{-- Miniatura / icono --}}
             @if ($category->image)
-                <img src="{{ asset($category->image) }}" alt="{{ $category->name }}"
+                <img src="{{ asset($category->image) }}" alt="{{ $category->display_name }}"
                      class="rounded-circle flex-shrink-0 d-none d-sm-block"
                      width="40" height="40" loading="lazy" decoding="async"
                      style="object-fit:cover;">
@@ -38,7 +38,8 @@
             <div class="flex-grow-1 min-width-0" style="min-width:0;">
                 <div class="d-flex flex-wrap align-items-center gap-1 mb-1">
                     <span class="fw-semibold text-dark" style="word-break:break-word;">
-                        {{ $category->name }}
+                        <span class="badge bg-primary me-2">{{ $category->numbering }}</span>
+                        {{ $category->display_name }}
                     </span>
 
                     {{-- Badges de archivos --}}

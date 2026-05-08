@@ -116,9 +116,10 @@ class EnlacesController extends Controller
 
         $ultimosAportes = Aportacion::query()
             ->where('is_approved', true)
+            ->whereNotNull('category_id')
             ->with(['category.parent.parent'])
             ->latest()
-            ->take(4)
+            ->take(8)
             ->get();
 
         return view('welcome', compact(

@@ -6,8 +6,17 @@
         </button>
     </div>
     <div class="p-4 pt-5">
-        <h1><a href="{{ route('home') }}" class="logo"><img src="{{ asset('img/Asociacion-logo-blanco.png') }}"
-                    width="100%" alt=""></a></h1>
+        <h1>
+            @role('sisicha')
+                <a href="{{ route('sisipedia.categories.index') }}" class="logo">
+                    <img src="{{ asset('img/Asociacion-logo-blanco.png') }}" width="100%" alt="">
+                </a>
+            @else
+                <a href="{{ route('home') }}" class="logo">
+                    <img src="{{ asset('img/Asociacion-logo-blanco.png') }}" width="100%" alt="">
+                </a>
+            @endrole
+        </h1>
         <ul class="list-unstyled components mb-5">
             @role('admin')
                 <li class="active">
@@ -74,11 +83,8 @@
                         class="dropdown-toggle"><i class="fa fa-layer-group"></i> Sisipedia</a>
                     <ul class="collapse list-unstyled" id="sisipediaSisichaSubmenu">
                         <li>
-                            <a href="{{ route('home') }}"><span class="flecha-admin">→</span> Panel (inicio)</a>
-                        </li>
-                        <li>
                             <a href="{{ route('sisipedia.categories.index') }}"><span class="flecha-admin">→</span>
-                                Registros (categorías)</a>
+                                Registros</a>
                         </li>
                         <li>
                             <a href="{{ route('sisipedia.aportaciones.index') }}"><span class="flecha-admin">→</span>

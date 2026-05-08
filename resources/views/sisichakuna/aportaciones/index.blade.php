@@ -88,7 +88,7 @@
                         <span class="input-group-text"><i class="fa fa-search"></i></span>
                     </div>
                     <input type="text" name="q" value="{{ request('q') }}"
-                           class="form-control" placeholder="Nombre, institución, ubicación…" style="min-width:200px;">
+                           class="form-control" placeholder="Nombre, título, institución, lugar…" style="min-width:200px;">
                 </div>
             </div>
 
@@ -108,7 +108,7 @@
                     <option value="">— Todas las categorías —</option>
                     @foreach($categories as $cat)
                         <option value="{{ $cat->id }}" @selected(request('category_id') == $cat->id)>
-                            {{ $cat->parent ? $cat->parent->name.' › ' : '' }}{{ $cat->name }}
+                            {{ $cat->parent ? $cat->parent->display_name.' › ' : '' }}{{ $cat->display_name }}
                         </option>
                     @endforeach
                 </select>
@@ -152,10 +152,11 @@
                     <tr>
                         <th style="width:1%">#</th>
                         <th>Nombre en lengua original</th>
+                        <th>Título</th>
                         <th>Rol</th>
                         <th>Registro (categoría)</th>
                         <th class="text-center">Estado</th>
-                        <th>Institución / Ubicación</th>
+                        <th>Institución / Trabajo / Ubicación</th>
                         <th class="text-center">Archivos</th>
                         <th>Fecha</th>
                         <th style="width:1%"></th>
@@ -176,10 +177,18 @@
                         <td class="align-middle">
                             <div class="font-weight-semibold">{{ $ap->nombre_ol }}</div>
                             @if($ap->detalle)
-                                <small class="text-muted d-block" style="max-width:260px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;"
-                                       title="{{ $ap->detalle }}">
-                                    {{ $ap->detalle }}
-                                </small>
+                                <div class="text-muted small mt-1"
+                                     style="max-width:280px;max-height:60px;overflow:hidden;line-height:1.4;"
+                                     title="{{ strip_tags($ap->detalle) }}">
+                                    {!! $ap->detalle !!}
+                                </div>
+                            @endif
+                        </td>
+                        <td class="align-middle small">
+                            @if($ap->titulo)
+                                <span class="badge badge-info">{{ $ap->titulo }}</span>
+                            @else
+                                <span class="text-muted">—</span>
                             @endif
                         </td>
 
@@ -202,7 +211,7 @@
                                         <a href="{{ route('sisipedia.categories.admin-show', $node) }}"
                                            class="badge badge-light border text-dark font-weight-normal"
                                            style="font-size:.75rem;">
-                                            {{ $node->name }}
+                                            {{ $node->display_name }}
                                         </a>
                                     @endforeach
                                 </div>
@@ -227,10 +236,13 @@
                             @if($ap->institucion)
                                 <div><i class="fa fa-building text-muted mr-1"></i>{{ $ap->institucion }}</div>
                             @endif
+                            @if($ap->lugar_trabajo)
+                                <div><i class="fa fa-briefcase text-muted mr-1"></i>{{ $ap->lugar_trabajo }}</div>
+                            @endif
                             @if($ap->ubicacion)
                                 <div><i class="fa fa-map-marker text-muted mr-1"></i>{{ $ap->ubicacion }}</div>
                             @endif
-                            @if(!$ap->institucion && !$ap->ubicacion)
+                            @if(!$ap->institucion && !$ap->lugar_trabajo && !$ap->ubicacion)
                                 <span class="text-muted">—</span>
                             @endif
                         </td>
@@ -242,6 +254,16 @@
                                     <a href="{{ \App\Services\GoogleDriveService::getUrl($ap->pdf) }}"
                                        target="_blank" class="badge badge-danger" title="PDF">
                                         <i class="fa fa-file-pdf-o"></i>
+                                    </a>
+                                @endif
+                                @if($ap->imagen)
+                                    <a href="{{ \App\Services\GoogleDriveService::getUrl($ap->imagen) }}"
+                                       target="_blank" title="Ver imagen en Drive">
+                                        <img src="{{ \App\Services\GoogleDriveService::getThumbnailUrl($ap->imagen, 60) }}"
+                                             alt="Imagen" width="60" height="60"
+                                             style="object-fit:cover;border-radius:4px;border:1px solid #dee2e6;"
+                                             onerror="this.style.display='none';this.nextElementSibling.style.display='inline-block';">
+                                        <span class="badge badge-info d-none"><i class="fa fa-image"></i></span>
                                     </a>
                                 @endif
                                 @if($ap->doc)
@@ -262,7 +284,7 @@
                                         <i class="fa fa-video-camera"></i>
                                     </a>
                                 @endif
-                                @if(!$ap->pdf && !$ap->doc && !$ap->audio && !$ap->video)
+                                @if(!$ap->imagen && !$ap->pdf && !$ap->doc && !$ap->audio && !$ap->video)
                                     <span class="text-muted">—</span>
                                 @endif
                             </div>
@@ -288,14 +310,30 @@
                                     data-action="{{ route('sisipedia.aportaciones.update', $ap) }}"
                                     data-nombre="{{ e($ap->nombre_ol) }}"
                                     data-rol="{{ $ap->rol_nombre }}"
+                                    data-titulo="{{ e($ap->titulo ?? '') }}"
                                     data-institucion="{{ e($ap->institucion ?? '') }}"
+                                    data-lugar-trabajo="{{ e($ap->lugar_trabajo ?? '') }}"
                                     data-ubicacion="{{ e($ap->ubicacion ?? '') }}"
                                     data-detalle="{{ e($ap->detalle ?? '') }}"
                                     data-category-id="{{ $ap->category_id ?? '' }}"
+                                    data-imagen-id="{{ $ap->imagen ?? '' }}"
                                     title="Editar aportación">
                                 <i class="fa fa-edit"></i>
                             </button>
-                            @if(!$ap->is_approved)
+                            @if(!$ap->category_id)
+                                <button type="button"
+                                        class="btn btn-sm mr-1 sisipedia-btn-aprobar font-weight-bold"
+                                        style="background:#f59e0b;color:#fff;border:none;box-shadow:0 2px 6px rgba(245,158,11,.45);letter-spacing:.02em;"
+                                        data-toggle="modal"
+                                        data-target="#modalAprobarAporte"
+                                        data-action="{{ route('sisipedia.aportaciones.approve', $ap) }}"
+                                        data-nombre="{{ e($ap->nombre_ol) }}"
+                                        data-rol="{{ e(\App\Models\sisipedia\Aportacion::etiquetaRol($ap->rol_nombre)) }}"
+                                        data-needs-category="1"
+                                        title="Sin registro asignado — haz clic para vincular">
+                                    <i class="fa fa-link mr-1"></i>Vincular registro
+                                </button>
+                            @elseif(!$ap->is_approved)
                                 <button type="button"
                                         class="btn btn-sm btn-success mr-1 sisipedia-btn-aprobar"
                                         data-toggle="modal"
@@ -303,14 +341,9 @@
                                         data-action="{{ route('sisipedia.aportaciones.approve', $ap) }}"
                                         data-nombre="{{ e($ap->nombre_ol) }}"
                                         data-rol="{{ e(\App\Models\sisipedia\Aportacion::etiquetaRol($ap->rol_nombre)) }}"
-                                        data-needs-category="{{ $ap->category_id ? '0' : '1' }}"
-                                        title="Abrir asistente de aprobación">
-                                    <i class="fa fa-check-circle mr-1"></i>
-                                    @if($ap->category_id)
-                                        Aprobar
-                                    @else
-                                        Vincular registro…
-                                    @endif
+                                        data-needs-category="0"
+                                        title="Aprobar aportación">
+                                    <i class="fa fa-check-circle mr-1"></i>Aprobar
                                 </button>
                             @endif
                             @if($cat)
@@ -352,7 +385,7 @@
 {{-- Modal: Editar aportación --}}
 <div class="modal fade" id="modalEditarAporte" tabindex="-1" role="dialog" aria-labelledby="modalEditarAporteTitulo" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
-        <form method="POST" id="formEditarAporte" action="#" class="modal-content border-0 shadow-lg">
+        <form method="POST" id="formEditarAporte" action="#" class="modal-content border-0 shadow-lg" enctype="multipart/form-data">
             @csrf
             @method('PATCH')
             <div class="modal-header border-0 pb-0 text-white"
@@ -387,8 +420,20 @@
                 </div>
                 <div class="row">
                     <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold small text-dark d-block mb-1">Título</label>
+                        <input type="text" name="titulo" id="editTitulo"
+                               class="form-control" maxlength="255">
+                    </div>
+                    <div class="col-md-6 mb-3">
                         <label class="font-weight-bold small text-dark d-block mb-1">Institución</label>
                         <input type="text" name="institucion" id="editInstitucion"
+                               class="form-control" maxlength="255">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="font-weight-bold small text-dark d-block mb-1">Lugar de trabajo</label>
+                        <input type="text" name="lugar_trabajo" id="editLugarTrabajo"
                                class="form-control" maxlength="255">
                     </div>
                     <div class="col-md-6 mb-3">
@@ -399,7 +444,21 @@
                 </div>
                 <div class="mb-3">
                     <label class="font-weight-bold small text-dark d-block mb-1">Detalle / Descripción</label>
-                    <textarea name="detalle" id="editDetalle" class="form-control" rows="3"></textarea>
+                    <textarea name="detalle" id="editDetalle" class="form-control summernote-editor" rows="3"></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="font-weight-bold small text-dark d-block mb-1">
+                        Imagen (opcional, reemplaza la actual)
+                    </label>
+                    <div id="editImagenPreviewWrap" class="mb-2 d-none">
+                        <a id="editImagenPreviewLink" href="#" target="_blank" rel="noopener">
+                            <img id="editImagenPreview" src="" alt="Imagen actual"
+                                 style="max-height:100px;border-radius:6px;border:1px solid #dee2e6;"
+                                 onerror="document.getElementById('editImagenPreviewWrap').classList.add('d-none');">
+                        </a>
+                        <small class="text-muted d-block mt-1">Imagen actual — sube un archivo nuevo para reemplazarla.</small>
+                    </div>
+                    <input type="file" name="imagen" id="editImagen" class="form-control" accept=".jpg,.jpeg,.png,.webp,.gif">
                 </div>
                 <hr class="my-3">
                 <div class="mb-2">
@@ -410,7 +469,7 @@
                         <option value="">— Sin registro asignado (pendiente) —</option>
                         @foreach($categories as $cat)
                             <option value="{{ $cat->id }}">
-                                {{ $cat->parent ? $cat->parent->name.' › ' : '' }}{{ $cat->name }}
+                                {{ $cat->parent ? $cat->parent->display_name.' › ' : '' }}{{ $cat->display_name }}
                             </option>
                         @endforeach
                     </select>
@@ -437,16 +496,60 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!form) return;
             form.setAttribute('action', btn.getAttribute('data-action'));
             document.getElementById('editNombreOl').value    = btn.getAttribute('data-nombre') || '';
+            document.getElementById('editTitulo').value      = btn.getAttribute('data-titulo') || '';
             document.getElementById('editInstitucion').value = btn.getAttribute('data-institucion') || '';
+            document.getElementById('editLugarTrabajo').value = btn.getAttribute('data-lugar-trabajo') || '';
             document.getElementById('editUbicacion').value   = btn.getAttribute('data-ubicacion') || '';
-            document.getElementById('editDetalle').value     = btn.getAttribute('data-detalle') || '';
+            var detalleContent = btn.getAttribute('data-detalle') || '';
+            var imagenId = btn.getAttribute('data-imagen-id') || '';
+            document.getElementById('editImagen').value = '';
+
+            var previewWrap = document.getElementById('editImagenPreviewWrap');
+            var previewImg  = document.getElementById('editImagenPreview');
+            var previewLink = document.getElementById('editImagenPreviewLink');
+            if (imagenId && previewWrap && previewImg && previewLink) {
+                previewImg.src  = 'https://drive.google.com/thumbnail?id=' + imagenId + '&sz=w200';
+                previewLink.href = 'https://drive.google.com/file/d/' + imagenId + '/view';
+                previewWrap.classList.remove('d-none');
+            } else if (previewWrap) {
+                previewWrap.classList.add('d-none');
+            }
 
             var rolSel = document.getElementById('editRolNombre');
             if (rolSel) rolSel.value = btn.getAttribute('data-rol') || '';
 
             var catSel = document.getElementById('editCategoryId');
             if (catSel) catSel.value = btn.getAttribute('data-category-id') || '';
+
+            // Cargar contenido en Summernote después de que el modal se muestre
+            setTimeout(function() {
+                if (window.jQuery && $('.summernote-editor').length) {
+                    $('.summernote-editor').summernote('code', detalleContent);
+                }
+            }, 100);
         });
+    });
+
+    // Inicializar Summernote editor para el campo de detalle
+    document.addEventListener('DOMContentLoaded', function() {
+        if (window.jQuery) {
+            $('.summernote-editor').summernote({
+                height: 120,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                placeholder: 'Describe los detalles de esta aportación...',
+                callbacks: {
+                    onInit: function() {
+                        $('.note-editable').css('font-size', '14px');
+                    }
+                }
+            });
+        }
     });
 });
 </script>

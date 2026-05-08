@@ -119,45 +119,62 @@
                         @csrf
                         <input type="hidden" name="rol_nombre" id="homeInputRolNombre" value="{{ old('rol_nombre') }}">
                         <div class="row g-3 mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-semibold">Nombre completo:<span
-                                        class="text-danger">*</span></label>
+                            <div class="col-md-4">
+                                <label class="form-label fw-semibold">Nombre completo:<span class="text-danger">*</span></label>
                                 <input type="text" name="nombre_ol" required
                                     class="form-control @error('nombre_ol') is-invalid @enderror"
                                     value="{{ old('nombre_ol') }}">
                                 @error('nombre_ol')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">Institución</label>
                                 <input type="text" name="institucion" class="form-control @error('institucion') is-invalid @enderror"
                                     value="{{ old('institucion') }}">
                             </div>
-                            <div class="col-md-3">
+                            <div class="col-md-4">
                                 <label class="form-label fw-semibold">Ubicación</label>
                                 <input type="text" name="ubicacion" class="form-control @error('ubicacion') is-invalid @enderror"
                                     value="{{ old('ubicacion') }}">
                             </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Título</label>
+                                <input type="text" name="titulo"
+                                    class="form-control @error('titulo') is-invalid @enderror"
+                                    value="{{ old('titulo') }}">
+                                @error('titulo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-semibold">Lugar de trabajo</label>
+                                <input type="text" name="lugar_trabajo" class="form-control @error('lugar_trabajo') is-invalid @enderror"
+                                    value="{{ old('lugar_trabajo') }}">
+                                @error('lugar_trabajo')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
                             <div class="col-12">
                                 <label class="form-label fw-semibold">Detalle</label>
                                 <textarea name="detalle" rows="3"
-                                    class="form-control @error('detalle') is-invalid @enderror">{{ old('detalle') }}</textarea>
+                                    class="form-control summernote-editor @error('detalle') is-invalid @enderror">{{ old('detalle') }}</textarea>
                             </div>
-                            <div class="col-md-3">
+                            <div class="col">
+                                <label class="form-label fw-semibold"><i class="fa fa-image text-info me-1"></i>Imagen</label>
+                                <input type="file" name="imagen" accept=".jpg,.jpeg,.png,.webp,.gif" class="form-control @error('imagen') is-invalid @enderror">
+                                @error('imagen')<div class="invalid-feedback">{{ $message }}</div>@enderror
+                            </div>
+                            <div class="col">
                                 <label class="form-label fw-semibold"><i class="fa fa-file-pdf text-danger me-1"></i>PDF</label>
                                 <input type="file" name="pdf" accept=".pdf" class="form-control @error('pdf') is-invalid @enderror">
                                 @error('pdf')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col">
                                 <label class="form-label fw-semibold"><i class="fa fa-file-word text-primary me-1"></i>Word</label>
                                 <input type="file" name="doc" accept=".doc,.docx" class="form-control @error('doc') is-invalid @enderror">
                                 @error('doc')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col">
                                 <label class="form-label fw-semibold"><i class="fa fa-music text-success me-1"></i>Audio</label>
                                 <input type="file" name="audio" accept=".mp3,.wav,.ogg" class="form-control @error('audio') is-invalid @enderror">
                                 @error('audio')<div class="invalid-feedback">{{ $message }}</div>@enderror
                             </div>
-                            <div class="col-md-3">
+                            <div class="col">
                                 <label class="form-label fw-semibold"><i class="fa fa-video text-warning me-1"></i>Video</label>
                                 <input type="file" name="video" accept=".mp4,.webm,.mov" class="form-control @error('video') is-invalid @enderror">
                                 @error('video')<div class="invalid-feedback">{{ $message }}</div>@enderror
@@ -178,7 +195,7 @@
             <div class="row justify-content-center mt-4 pt-3">
                 <div class="col-lg-12">
                     <h3 class="h6 fw-bold text-secondary mb-3">
-                        <i class="fa-solid fa-clock me-2 text-primary"></i>Últimas aportaciones aprobadas
+                        <i class="fa-solid fa-clock me-2 text-primary"></i>Últimas aportaciones
                     </h3>
                     <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-4 g-3">
                         @foreach ($ultimosAportes as $uap)
@@ -190,27 +207,47 @@
                                     'Niño/Estudiante' => 'warning',
                                     default => 'secondary',
                                 };
+                                $uCat = $uap->category;
                             @endphp
                             <div class="col">
-                                <div class="card border-0 shadow-sm rounded-4 h-100 border-start border-4 border-{{ $uColor }}">
-                                    <div class="card-body p-3">
-                                        <div class="fw-semibold small text-dark mb-1 text-truncate" title="{{ $uap->nombre_ol }}">
+                                <div class="card border-0 shadow-sm rounded-4 h-100 d-flex flex-column" style="border-top: 3px solid var(--bs-{{ $uColor }}) !important;">
+                                    <div class="card-body p-3 flex-grow-1">
+                                        {{-- Nombre --}}
+                                        <div class="fw-bold small text-dark mb-1 text-truncate" title="{{ $uap->nombre_ol }}">
                                             {{ $uap->nombre_ol }}
                                         </div>
-                                        <span class="badge bg-{{ $uColor }} bg-opacity-10 text-{{ $uColor }} border border-{{ $uColor }} mb-2" style="font-size:.65rem;">
+                                        {{-- Rol --}}
+                                        <span class="badge bg-{{ $uColor }} bg-opacity-10 text-{{ $uColor }} border border-{{ $uColor }} mb-2" style="font-size:.62rem;">
                                             {{ \App\Models\sisipedia\Aportacion::etiquetaRol($uap->rol_nombre) }}
                                         </span>
-                                        @if ($uap->category)
-                                            <a href="{{ route('sisipedia.categories.show', $uap->category) }}" class="d-block small text-decoration-none text-truncate" title="{{ $uap->category->name }}">
-                                                <i class="fa fa-folder-open me-1"></i>{{ $uap->category->name }}
-                                            </a>
-                                        @else
-                                            <span class="small text-muted">Sin registro vinculado</span>
+                                        {{-- Miga de pan del registro --}}
+                                        @if ($uCat)
+                                            @if ($uCat->parent)
+                                                <div class="text-muted mb-1" style="font-size:.68rem;line-height:1.3;">
+                                                    @if ($uCat->parent->parent)
+                                                        {{ $uCat->parent->parent->display_name }} ›
+                                                    @endif
+                                                    {{ $uCat->parent->display_name }} ›
+                                                </div>
+                                            @endif
+                                            <div class="fw-semibold small text-dark text-truncate mb-1" title="{{ $uCat->display_name }}">
+                                                <i class="fa fa-folder-open me-1 text-{{ $uColor }}"></i>{{ $uCat->display_name }}
+                                            </div>
                                         @endif
-                                        <div class="text-muted mt-2" style="font-size:.7rem;">
+                                        {{-- Fecha --}}
+                                        <div class="text-muted mt-1" style="font-size:.68rem;">
                                             {{ $uap->created_at->format('d/m/Y') }}
                                         </div>
                                     </div>
+                                    {{-- Botón de acción --}}
+                                    @if ($uCat)
+                                        <div class="card-footer bg-transparent border-0 pt-0 pb-3 px-3">
+                                            <a href="{{ route('sisipedia.categories.show', $uCat) }}"
+                                               class="btn btn-{{ $uColor }} btn-sm w-100 fw-semibold">
+                                                <i class="fa fa-arrow-right me-1"></i>Ver registro
+                                            </a>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
@@ -268,5 +305,41 @@
             homeSeleccionarRol(@json(old('rol_nombre')));
         });
     @endif
+
+    // Función para inicializar Summernote
+    function initSummernote() {
+        if (window.jQuery && $('.summernote-editor').length && !$('.summernote-editor').hasClass('summernote-initialized')) {
+            $('.summernote-editor').summernote({
+                height: 120,
+                toolbar: [
+                    ['style', ['style']],
+                    ['font', ['bold', 'italic', 'underline', 'clear']],
+                    ['para', ['ul', 'ol', 'paragraph']],
+                    ['insert', ['link']],
+                    ['view', ['fullscreen', 'codeview']]
+                ],
+                placeholder: 'Describe los detalles de esta aportación...',
+                callbacks: {
+                    onInit: function() {
+                        $('.note-editable').css('font-size', '14px');
+                        $('.summernote-editor').addClass('summernote-initialized');
+                    }
+                }
+            });
+        }
+    }
+
+    // Inicializar Summernote cuando se muestra el formulario
+    document.addEventListener('DOMContentLoaded', function() {
+        // Intentar inicializar por si el formulario ya está visible
+        initSummernote();
+        
+        // También inicializar cuando se selecciona un rol
+        const originalSeleccionarRol = window.homeSeleccionarRol;
+        window.homeSeleccionarRol = function(rol) {
+            originalSeleccionarRol(rol);
+            setTimeout(initSummernote, 100);
+        };
+    });
 })();
 </script>

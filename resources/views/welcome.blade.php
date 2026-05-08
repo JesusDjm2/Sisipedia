@@ -70,7 +70,7 @@
                                         <p class="small fw-semibold mb-1 text-dark">{{ $vFile->nombre_display }}</p>
                                         @if ($vFile->category)
                                             <a href="{{ route('sisipedia.categories.show', $vFile->category) }}" class="small text-decoration-none">
-                                                <i class="fa fa-link me-1"></i>{{ $vFile->category->name }}
+                                                <i class="fa fa-link me-1"></i>{{ $vFile->category->display_name }}
                                             </a>
                                         @endif
                                     </div>
@@ -95,7 +95,7 @@
                                         <p class="small fw-semibold mb-1 text-dark">{{ $ap->nombre_ol }}</p>
                                         @if ($ap->category)
                                             <a href="{{ route('sisipedia.categories.show', $ap->category) }}" class="small text-decoration-none">
-                                                <i class="fa fa-link me-1"></i>{{ $ap->category->name }}
+                                                <i class="fa fa-link me-1"></i>{{ $ap->category->display_name }}
                                             </a>
                                         @endif
                                     </div>
@@ -128,7 +128,7 @@
                                         <p class="small fw-semibold mt-2 mb-1">{{ $aFile->nombre_display }}</p>
                                         @if ($aFile->category)
                                             <a href="{{ route('sisipedia.categories.show', $aFile->category) }}" class="small text-decoration-none">
-                                                <i class="fa fa-link me-1"></i>{{ $aFile->category->name }}
+                                                <i class="fa fa-link me-1"></i>{{ $aFile->category->display_name }}
                                             </a>
                                         @endif
                                     </div>
@@ -152,7 +152,7 @@
                                         <p class="small fw-semibold mt-2 mb-1">{{ $ap->nombre_ol }}</p>
                                         @if ($ap->category)
                                             <a href="{{ route('sisipedia.categories.show', $ap->category) }}" class="small text-decoration-none">
-                                                <i class="fa fa-link me-1"></i>{{ $ap->category->name }}
+                                                <i class="fa fa-link me-1"></i>{{ $ap->category->display_name }}
                                             </a>
                                         @endif
                                     </div>
